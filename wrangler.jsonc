@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "growthbridge",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "binding": "ASSETS",
+    // /terma.html is served at /terma; /index.html at /.
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page",
+    // Only the API reaches the Worker; every page is a static file.
+    "run_worker_first": ["/api/*"]
+  },
+  "observability": { "enabled": true }
+}

@@ -1,0 +1,11 @@
+node_modules/
+dist/
+dist-ssr/
+.wrangler/
+.taste-skill/
+*.tsbuildinfo
+.dev.vars
+.dev.vars.*
+.env
+.env.*
+media-src/

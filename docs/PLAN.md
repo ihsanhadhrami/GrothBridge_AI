@@ -1,4 +1,4 @@
-# growthbridge.ai build plan (Option A)
+# growthbridge.my build plan (Option A)
 
 Owner: Ihsan Hadhrami · Growth Bridge · Nov 2026
 Save this file in the repo as `docs/PLAN.md`.
@@ -10,7 +10,7 @@ The store is a React site on Cloudflare Workers with one small Worker API for ch
 | Part | Tool | Job |
 | --- | --- | --- |
 | Website | React + Vite, built with Claude Code | Home, product pages, checkout form, legal pages |
-| Hosting | Cloudflare Workers with static assets, on growthbridge.ai | Serves the pages, plus the small API |
+| Hosting | Cloudflare Workers with static assets, on growthbridge.my | Serves the pages, plus the small API |
 | Worker API (3 endpoints) | Cloudflare Worker | Creates CHIP payments, verifies CHIP's signed notifications, receives Siap Pasang enquiries. Secrets stay here, never in the browser |
 | Payments and refunds | CHIP Collect | FPX RM1.00 per paid transaction; refunds from the CHIP portal |
 | Delivery | Make | Shares the files and video, creates the Telegram invite, makes the invoice, sends the email |
@@ -55,7 +55,7 @@ Plus a **scheduled job (Cron Trigger) every 15 minutes:** it checks Notion order
 
 ## Before you build
 
-- [ ] **growthbridge.ai** registered (2-year minimum, auto-renew on), with its DNS on Cloudflare
+- [ ] **growthbridge.my** registered (2-year minimum, auto-renew on), with its DNS on Cloudflare
 - [ ] **CHIP merchant account:** apply with the SSM registration (GROWTH BRIDGE ENTERPRISE, 202603162028). Build with test keys while approval runs; approval checks the live site, so the legal pages go up first
 - [ ] **Cloudflare account** with Workers enabled, and `wrangler` logged in on the computer
 - [ ] **GitHub repo** `growthbridge-store` (private)
@@ -65,7 +65,7 @@ Plus a **scheduled job (Cron Trigger) every 15 minutes:** it checks Notion order
 - [ ] **Telegram bot** (@BotFather), an admin of the support group with permission to invite users
 - [ ] **Booking link** for Masterclass (Cal.com or Calendly)
 - [ ] **Legal text in Malay:** terms, refund policy, privacy notice (PDPA), contact
-- [ ] **Email sender:** the Growth Bridge Gmail through Make to start. Move to hello@growthbridge.ai once the domain's email is set up
+- [ ] **Email sender:** the Growth Bridge Gmail through Make to start. Move to hello@growthbridge.my once the domain's email is set up
 
 ## Execution: phases 0–6
 
@@ -155,10 +155,10 @@ missed webhook recovered by the cron.
 ```text
 Read CLAUDE.md. Set all secrets with wrangler secret put (I'll paste
 them when prompted, never into files). Deploy with wrangler, attach the
-custom domain growthbridge.ai and www, redirect www to the apex. Add
+custom domain growthbridge.my and www, redirect www to the apex. Add
 security headers (HSTS, CSP allowing only our own scripts and CHIP's
 checkout domain, X-Frame-Options DENY, Referrer-Policy). Confirm
-https://growthbridge.ai serves every prerendered page.
+https://growthbridge.my serves every prerendered page.
 ```
 
 ### Phase 5 · Make + Notion delivery
@@ -220,7 +220,7 @@ There are five scenarios. Only Delivery runs automatically, triggered instantly 
 | Item | Cost | Note |
 | --- | --- | --- |
 | CHIP Collect | RM1.00 per FPX payment; 1.0% debit card, 2.0% credit card | No setup or monthly fee |
-| growthbridge.ai domain | About US$150–230 upfront | .ai domains require a 2-year minimum registration |
+| growthbridge.my domain | About US$150–230 upfront | .ai domains require a 2-year minimum registration |
 | Cloudflare Workers + static assets | RM0 at this scale | The free tier covers a small store |
 | Make | Current plan | About 10–12 operations per order. Admin scenarios are On demand |
 | Notion, Google Drive, Gmail, Telegram | RM0 | Already in use |

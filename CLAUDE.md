@@ -1,10 +1,10 @@
-# CLAUDE.md — growthbridge.ai
+# CLAUDE.md — growthbridge.my
 
 The full build plan is in docs/PLAN.md. Follow it.
 Work ONE phase at a time. Stop after each phase, show me the result,
 and wait for my review before starting the next phase.
 
-Project: growthbridge.ai, the online store of GROWTH BRIDGE ENTERPRISE
+Project: growthbridge.my, the online store of GROWTH BRIDGE ENTERPRISE
 (202603162028 (NS0324359-K)), Malaysia. Sells digital products and
 classes; the first is "Autopost Threads".
 

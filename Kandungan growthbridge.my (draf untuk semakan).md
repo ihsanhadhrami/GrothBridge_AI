@@ -1,4 +1,4 @@
-# Kandungan growthbridge.ai (draf untuk semakan)
+# Kandungan growthbridge.my (draf untuk semakan)
 
 Nov 21, 2026 · @Ihsan Hadhrami
 
@@ -10,7 +10,7 @@ All copy below is a draft in Malay for the website. Anything in **\[square brack
 | --- | --- | --- |
 | 1 | Refund rule | No refund once access is sent, except: payment charged twice, access never delivered, or Masterclass cancelled 48+ hours before the session (refund RM170, the Masterclass portion) |
 | 2 | How you're introduced | "Ihsan Hadhrami, automation engineer" |
-| 3 | Contact email | growthbridge.biz@gmail.com until hello@growthbridge.ai is set up |
+| 3 | Contact email | growthbridge.biz@gmail.com until hello@growthbridge.my is set up |
 | 4 | Address on the contact page | Your SSM-registered business address. CHIP's review usually looks for it |
 | 5 | Telegram support hours | A fixed nightly window, e.g. 9pm–11pm daily |
 | 6 | Demo asset | A 30–60 second clip from your tutorial video: a Notion row turning into a live Threads post |
@@ -116,7 +116,7 @@ Nota bawah jadual: *Pelan jagaan untuk Siap Pasang tersedia dari RM300/bulan (pi
 
 *Kemas kini terakhir: \[tarikh go-live\]*
 
-**1. Siapa kami.** Laman web growthbridge.ai dikendalikan oleh GROWTH BRIDGE ENTERPRISE (No. Pendaftaran 202603162028 (NS0324359-K)), Malaysia ("kami"). Dengan membuat pembelian, anda bersetuju dengan terma ini.
+**1. Siapa kami.** Laman web growthbridge.my dikendalikan oleh GROWTH BRIDGE ENTERPRISE (No. Pendaftaran 202603162028 (NS0324359-K)), Malaysia ("kami"). Dengan membuat pembelian, anda bersetuju dengan terma ini.
 
 **2. Produk.** Kami menjual produk digital (manual, video, runbook), kelas online dan perkhidmatan setup. Kandungan setiap pakej diterangkan pada halaman produk semasa pembelian.
 
@@ -146,7 +146,7 @@ Nota bawah jadual: *Pelan jagaan untuk Siap Pasang tersedia dari RM300/bulan (pi
 
 *Notis ini dikeluarkan menurut Akta Perlindungan Data Peribadi 2010. Kemas kini terakhir: \[tarikh go-live\]*
 
-**1. Siapa kami.** GROWTH BRIDGE ENTERPRISE (202603162028 (NS0324359-K)) ialah pengguna data bagi maklumat yang anda berikan di growthbridge.ai.
+**1. Siapa kami.** GROWTH BRIDGE ENTERPRISE (202603162028 (NS0324359-K)) ialah pengguna data bagi maklumat yang anda berikan di growthbridge.my.
 
 **2. Data yang kami kumpul.**
 

@@ -88,6 +88,25 @@ Last updated: 2026-11-22.
   Legal, contact and 404 headlines stay plain.
 - Checks: smoke 12/12, chart 9/9, bars 8/8; inspector 0 FAIL on home, product and Siap Pasang; lint 0 FAIL.
 
+## Pre-launch for CHIP review and domain switch (2026-11-23)
+
+- **Domain is now growthbridge.my** (registered at Exabytes; Cloudflare zone added). Every growthbridge.ai in the repo was replaced; the content draft was renamed to `Kandungan growthbridge.my (draf untuk semakan).md`. All absolute URLs come from `site.url` in `src/data/site.ts`.
+- **Pre-launch mode:** `PAYMENTS_ENABLED = false` in `src/config.ts`.
+  - The Starter/Masterclass tiles and `#beli` show "Pembayaran dibuka tidak lama lagi" + "Tanya melalui emel" (mailto, subject "Pertanyaan: <product> <package>", names from products.ts).
+  - The product page renders no form. The Siap Pasang form validates, then opens the visitor's email app (no-JS fallback: `action="mailto:…"`).
+  - The client bundle contains no `/api/` call (the payment code is dropped at build time).
+- **Security headers:** `public/_headers` (HSTS, CSP self-only + `mailto:` form-action, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy). CHIP's domain gets added to the CSP when checkout exists.
+- **Routes:**
+  - `wrangler.jsonc` has the custom domain `growthbridge.my`, with `workers_dev`/`preview_urls` off.
+  - www is a separate Worker, `wrangler.www.jsonc` → `worker/www-redirect.ts` (301 to the apex, keeping path + query). It's separate because static assets are served before Worker code runs, so the main Worker can't redirect www.
+- **OG images:** the old ones had "growthbridge.ai" printed on them. They're moved out of `public/` to `brand/og-old-domain/` and not shipped. The meta tags still point to `/og/growthbridge.png` and `/og/autopost-threads.png`, which 404 until the owner's new images go there (1200×630 PNG, same names).
+- **Not deployed:** on 2026-11-23 the .my registry still delegates growthbridge.my to Exabytes (`ns184/185/186.mschosting.com`), so the Cloudflare zone is pending. When it's Active:
+  - Deploy: `npm run build && npx wrangler deploy && npx wrangler deploy -c wrangler.www.jsonc`
+  - Then verify: routes return 200, www → 301, http → https, plus title, canonical and og:image per page.
+  - Wrangler also needs `npx wrangler login` (the first attempt timed out).
+- **Check at deploy:** http→https. Static assets don't run Worker code, so if `http://growthbridge.my` doesn't redirect, the zone needs "Always Use HTTPS" (SSL/TLS → Edge Certificates). That's the owner's dashboard setting.
+- **Stale in docs/PLAN.md:** lines 58 and 223 still describe .ai pricing and the 2-year minimum; the owner should update them for .my.
+
 ## Decisions made with the owner
 
 - (2026-11-21) Missing Notion row: in Phase 3 the webhook creates the row if it's missing, built from the CHIP purchase itself. So **Phase 2 must put on the CHIP purchase: buyer name, email and phone, reference = order ID, and the product and package.** The Worker is the only thing that ever creates order rows; Make only updates them. Accepted gap: Notion fails at checkout AND the webhook is missed → the cron can't see the order (the checkout Telegram alert still fires).
@@ -108,7 +127,7 @@ Last updated: 2026-11-22.
 ## Waiting for the owner (remind every phase)
 
 - `LEGAL_LAST_UPDATED` in `src/data/site.ts`: fill in at Phase 6, on the day live CHIP keys go on after the test purchase. The build prints a reminder while it's null.
-- Optional: a video version that ends on growthbridge.ai instead of "DM @ihsaaann__".
+- Optional: a video version that ends on growthbridge.my instead of "DM @ihsaaann__".
 
 ## How to run
 

@@ -11,5 +11,12 @@
     // Only the API reaches the Worker; every page is a static file.
     "run_worker_first": ["/api/*"]
   },
+  // The apex only. www is a separate Worker (wrangler.www.jsonc) because
+  // static assets are served before any Worker code runs, so this Worker
+  // can't redirect www itself.
+  "routes": [{ "pattern": "growthbridge.my", "custom_domain": true }],
+  // No duplicate copy of the site on *.workers.dev.
+  "workers_dev": false,
+  "preview_urls": false,
   "observability": { "enabled": true }
 }

@@ -58,7 +58,7 @@ export const routes: RouteDef[] = [
     meta: {
       path: '/terma',
       title: 'Terma & Syarat | GrowthBridge',
-      description: `Terma dan syarat pembelian di growthbridge.ai, dikendalikan oleh ${site.company}.`,
+      description: `Terma dan syarat pembelian di growthbridge.my, dikendalikan oleh ${site.company}.`,
       type: 'article',
     },
     render: () => <LegalPage doc={terma} />,

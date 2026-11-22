@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { site } from '../data/site';
 
 /**
- * Legal text, in Malay, from "Kandungan growthbridge.ai (draf untuk semakan)".
+ * Legal text, in Malay, from "Kandungan growthbridge.my (draf untuk semakan)".
  * Values in [brackets] still need the owner's answer. Not legal advice:
  * the owner reviews every word before go-live.
  */
@@ -25,14 +25,14 @@ const Email = () => <a href={`mailto:${site.email}`}>{site.email}</a>;
 
 export const terma: LegalDoc = {
   title: 'Terma & Syarat',
-  lead: 'Syarat pembelian produk digital, kelas dan perkhidmatan di growthbridge.ai.',
+  lead: 'Syarat pembelian produk digital, kelas dan perkhidmatan di growthbridge.my.',
   sections: [
     {
       id: 'siapa-kami',
       title: 'Siapa kami',
       body: (
         <p>
-          Laman web growthbridge.ai dikendalikan oleh {site.company} (No. Pendaftaran {site.registration}),
+          Laman web growthbridge.my dikendalikan oleh {site.company} (No. Pendaftaran {site.registration}),
           Malaysia (“kami”). Dengan membuat pembelian, anda bersetuju dengan terma ini.
         </p>
       ),
@@ -164,7 +164,7 @@ export const privasi: LegalDoc = {
       body: (
         <p>
           {site.company} ({site.registration}) ialah pengguna data bagi maklumat yang anda berikan di
-          growthbridge.ai.
+          growthbridge.my.
         </p>
       ),
     },

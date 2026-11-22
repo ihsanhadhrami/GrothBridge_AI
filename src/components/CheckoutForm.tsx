@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react';
-import { checkoutPackages, type Product } from '../data/products';
+import { checkoutPackages, type CheckoutPackage, type Product } from '../data/products';
 import { site } from '../data/site';
 import { formatRM } from '../lib/money';
 import { validateCheckout, type FieldErrors } from '../lib/validate';
+import { enquiryMailto } from '../lib/mailto';
 import { Consent, Field, networkErrorMessage, postJson } from './Field';
 
 interface Props {
@@ -68,24 +69,7 @@ export function CheckoutForm({ product, selected, onSelect }: Props) {
           </h2>
 
           <input type="hidden" name="product" value={product.slug} />
-          <fieldset className="choice">
-            <legend>Pakej</legend>
-            <div className="package-choice">
-              {packages.map((p) => (
-                <label key={p.id} className="package-option">
-                  <input
-                    type="radio"
-                    name="package"
-                    value={p.id}
-                    checked={pkg.id === p.id}
-                    onChange={() => onSelect(p.id)}
-                  />
-                  <span className="package-option-name">{p.name}</span>
-                  <span className="package-option-price">{formatRM(p.priceSen)}</span>
-                </label>
-              ))}
-            </div>
-          </fieldset>
+          <PackageChoice packages={packages} selected={pkg.id} onSelect={onSelect} />
 
           <Field
             id="name"
@@ -142,20 +126,84 @@ export function CheckoutForm({ product, selected, onSelect }: Props) {
           </p>
         </form>
 
-        <aside className="order-summary" aria-label="Ringkasan pesanan">
-          <p className="order-name">{pkg.name}</p>
-          <p className="order-price">{formatRM(pkg.priceSen)}</p>
-          <p className="order-for">{pkg.audience}</p>
-          <ul className="ticks">
-            {pkg.includes.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
-          </ul>
-          <p className="order-after">
-            Selepas bayaran berjaya, emel dengan akses dan invois dihantar secara automatik.
-          </p>
-        </aside>
+        <OrderSummary pkg={pkg} />
       </div>
     </section>
+  );
+}
+
+/**
+ * The same section while PAYMENTS_ENABLED is false (pre-launch). No form and
+ * no request to /api/*: the visitor can compare packages and email us.
+ */
+export function CheckoutClosed({ product, selected, onSelect }: Props) {
+  const packages = checkoutPackages(product);
+  const pkg = packages.find((p) => p.id === selected) ?? packages[0]!;
+  return (
+    <section id="beli" className="checkout" aria-labelledby="beli-title">
+      <div className="frame checkout-grid">
+        <div className="checkout-form">
+          <h2 id="beli-title" className="t-2">
+            Beli {pkg.name}
+          </h2>
+          <PackageChoice packages={packages} selected={pkg.id} onSelect={onSelect} />
+          <div className="buy-closed">
+            <p className="buy-closed-note" role="status">
+              Pembayaran dibuka tidak lama lagi
+            </p>
+            <a id="tanya-emel" className="btn btn-block" href={enquiryMailto(product.name, pkg.name)}>
+              Tanya melalui emel
+            </a>
+          </div>
+          <p className="form-note">
+            Bayaran melalui CHIP (FPX atau kad) akan dibuka tidak lama lagi. Sementara itu, emel{' '}
+            <a href={enquiryMailto(product.name, pkg.name)}>{site.email}</a> dan kami balas dalam 1–2 hari
+            bekerja.
+          </p>
+        </div>
+        <OrderSummary pkg={pkg} />
+      </div>
+    </section>
+  );
+}
+
+function PackageChoice({
+  packages,
+  selected,
+  onSelect,
+}: {
+  packages: CheckoutPackage[];
+  selected: string;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <fieldset className="choice">
+      <legend>Pakej</legend>
+      <div className="package-choice">
+        {packages.map((p) => (
+          <label key={p.id} className="package-option">
+            <input type="radio" name="package" value={p.id} checked={selected === p.id} onChange={() => onSelect(p.id)} />
+            <span className="package-option-name">{p.name}</span>
+            <span className="package-option-price">{formatRM(p.priceSen)}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
+  );
+}
+
+function OrderSummary({ pkg }: { pkg: CheckoutPackage }) {
+  return (
+    <aside className="order-summary" aria-label="Ringkasan pesanan">
+      <p className="order-name">{pkg.name}</p>
+      <p className="order-price">{formatRM(pkg.priceSen)}</p>
+      <p className="order-for">{pkg.audience}</p>
+      <ul className="ticks">
+        {pkg.includes.map((line) => (
+          <li key={line}>{line}</li>
+        ))}
+      </ul>
+      <p className="order-after">Selepas bayaran berjaya, emel dengan akses dan invois dihantar secara automatik.</p>
+    </aside>
   );
 }

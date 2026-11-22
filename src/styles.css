@@ -798,6 +798,43 @@ main:focus {
 .tile-3 .tile-action:focus-visible {
   outline-color: var(--navy);
 }
+/* Pre-launch (PAYMENTS_ENABLED false): a grey bar where "Beli" was, and the
+   email button under it. */
+.tile-closed {
+  display: grid;
+}
+.tile-closed-note,
+.buy-closed-note {
+  display: flex;
+  align-items: center;
+  background: var(--surface-2);
+  color: var(--ink);
+  font-weight: 600;
+}
+.tile-closed-note {
+  min-height: 64px;
+  padding: 0 28px;
+}
+.tile-3 .tile-closed-note {
+  background: var(--surface-3);
+}
+.buy-closed {
+  display: grid;
+  gap: 8px;
+}
+.buy-closed-note {
+  min-height: 52px;
+  padding: 0 20px;
+}
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--ink);
+}
+.btn-secondary:hover {
+  background: var(--surface-3);
+  color: var(--ink);
+}
+
 .pricing-note {
   margin-top: 24px;
   color: var(--muted);

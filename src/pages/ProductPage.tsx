@@ -5,7 +5,9 @@ import { Bars } from '../components/Mark';
 import { TeaserVideo } from '../components/TeaserVideo';
 import { Highlight } from '../components/Highlight';
 import { ScheduleDemo } from '../components/ScheduleDemo';
-import { CheckoutForm } from '../components/CheckoutForm';
+import { CheckoutClosed, CheckoutForm } from '../components/CheckoutForm';
+import { PAYMENTS_ENABLED } from '../config';
+import { enquiryMailto } from '../lib/mailto';
 
 export function ProductPage({ product }: { product: Product }) {
   const buyable = checkoutPackages(product);
@@ -115,14 +117,18 @@ export function ProductPage({ product }: { product: Product }) {
               <p>Dari {formatRM(fromPriceSen(product))}. Bayar sekali.</p>
             </div>
             {product.packages.map((p, i) => (
-              <PackageTile key={p.id} pkg={p} index={i} onChoose={choose} />
+              <PackageTile key={p.id} productName={product.name} pkg={p} index={i} onChoose={choose} />
             ))}
           </div>
           <p className="pricing-note">{product.packagesNote}</p>
         </div>
       </section>
 
-      <CheckoutForm product={product} selected={selected} onSelect={setSelected} />
+      {PAYMENTS_ENABLED ? (
+        <CheckoutForm product={product} selected={selected} onSelect={setSelected} />
+      ) : (
+        <CheckoutClosed product={product} selected={selected} onSelect={setSelected} />
+      )}
 
       <section className="faq" aria-labelledby="faq-title">
         <div className="frame faq-grid">
@@ -156,7 +162,17 @@ export function ProductPage({ product }: { product: Product }) {
   );
 }
 
-function PackageTile({ pkg, index, onChoose }: { pkg: Package; index: number; onChoose: (id: string) => void }) {
+function PackageTile({
+  productName,
+  pkg,
+  index,
+  onChoose,
+}: {
+  productName: string;
+  pkg: Package;
+  index: number;
+  onChoose: (id: string) => void;
+}) {
   const price = pkg.kind === 'checkout' ? formatRM(pkg.priceSen) : formatRM(pkg.displayPriceSen);
   return (
     <article className={`tile tile-${index + 1}`} aria-labelledby={`tile-${pkg.id}`}>
@@ -175,7 +191,14 @@ function PackageTile({ pkg, index, onChoose }: { pkg: Package; index: number; on
           <p className="tile-extra">Skop, harga akhir dan jadual dipersetujui secara bertulis sebelum kerja bermula.</p>
         )}
       </div>
-      {pkg.kind === 'checkout' ? (
+      {pkg.kind === 'checkout' && !PAYMENTS_ENABLED ? (
+        <div className="tile-closed">
+          <p className="tile-closed-note">Pembayaran dibuka tidak lama lagi</p>
+          <a className="tile-action tile-action-alt" href={enquiryMailto(productName, pkg.name)}>
+            Tanya melalui emel
+          </a>
+        </div>
+      ) : pkg.kind === 'checkout' ? (
         <a
           className="tile-action"
           href={`?pakej=${pkg.id}#beli`}

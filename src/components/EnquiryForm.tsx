@@ -1,14 +1,26 @@
 import { useState, type FormEvent } from 'react';
 import { site } from '../data/site';
+import { products } from '../data/products';
 import { validateEnquiry, type FieldErrors } from '../lib/validate';
 import { Consent, Field, networkErrorMessage, postJson } from './Field';
+import { PAYMENTS_ENABLED } from '../config';
+import { enquiryMailto } from '../lib/mailto';
 
-/** Siap Pasang enquiry. The Worker saves it to Notion and alerts the owner. */
+// Names for the email subject come from the products file, like everywhere else.
+const product = products[0]!;
+const PRODUCT = product.name;
+const PACKAGE = product.packages.find((p) => p.kind === 'enquiry')?.name ?? 'Siap Pasang';
+
+/**
+ * Siap Pasang enquiry. Live: the Worker saves it to Notion and alerts the
+ * owner. Pre-launch (PAYMENTS_ENABLED false): nothing is posted; the visitor's
+ * email app opens with the details filled in, to send themselves.
+ */
 export function EnquiryForm() {
   const [v, setV] = useState({ name: '', email: '', phone: '', business: '', threads: '', message: '' });
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent'>('idle');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'mailed'>('idle');
   const [formError, setFormError] = useState('');
 
   const set = (k: keyof typeof v) => (e: { target: { value: string } }) =>
@@ -22,6 +34,21 @@ export function EnquiryForm() {
     setFormError('');
     if (Object.keys(found).length > 0) {
       document.getElementById(Object.keys(found)[0]!)?.focus();
+      return;
+    }
+    if (!PAYMENTS_ENABLED) {
+      const body = [
+        `Nama: ${v.name.trim()}`,
+        `Emel: ${v.email.trim()}`,
+        `Telefon: ${v.phone.trim()}`,
+        `Bisnes: ${v.business.trim() || '-'}`,
+        `Threads: ${v.threads.trim() || '-'}`,
+        '',
+        'Apa yang saya mahu automasikan:',
+        v.message.trim(),
+      ].join('\n');
+      window.location.href = enquiryMailto(PRODUCT, PACKAGE, body);
+      setStatus('mailed');
       return;
     }
     setStatus('sending');
@@ -43,6 +70,24 @@ export function EnquiryForm() {
     setStatus('idle');
   }
 
+  if (status === 'mailed') {
+    return (
+      <div className="form-done" role="status">
+        <h2 className="t-3">Aplikasi emel anda sepatutnya terbuka sekarang.</h2>
+        <p>Butiran anda sudah diisi. Tekan Hantar dalam aplikasi emel untuk menghantarnya kepada kami.</p>
+        <p>
+          Jika ia tidak terbuka, emel terus ke{' '}
+          <a href={enquiryMailto(PRODUCT, PACKAGE)}>{site.email}</a>.
+        </p>
+        <p>
+          <button type="button" className="btn btn-secondary" onClick={() => setStatus('idle')}>
+            Kembali ke borang
+          </button>
+        </p>
+      </div>
+    );
+  }
+
   if (status === 'sent') {
     return (
       <div className="form-done" role="status">
@@ -53,7 +98,15 @@ export function EnquiryForm() {
   }
 
   return (
-    <form className="enquiry-form" onSubmit={onSubmit} noValidate action="/api/enquiry" method="post">
+    <form
+      className="enquiry-form"
+      onSubmit={onSubmit}
+      noValidate
+      // Without JS: pre-launch hands the fields to the email app, never to /api/*.
+      action={PAYMENTS_ENABLED ? '/api/enquiry' : enquiryMailto(PRODUCT, PACKAGE)}
+      method="post"
+      encType={PAYMENTS_ENABLED ? undefined : 'text/plain'}
+    >
       <Field id="name" label="Nama penuh" autoComplete="name" value={v.name} onChange={set('name')} error={errors.name} required maxLength={100} />
       <Field id="email" label="Emel" type="email" autoComplete="email" inputMode="email" value={v.email} onChange={set('email')} error={errors.email} required />
       <Field
@@ -92,13 +145,16 @@ export function EnquiryForm() {
       <Consent checked={consent} onChange={setConsent} error={errors.consent}>
         Saya setuju dengan <a href="/terma">Terma & Syarat</a> dan <a href="/privasi">Notis Privasi</a>.
       </Consent>
+      {!PAYMENTS_ENABLED && (
+        <p className="form-note">Butang ini membuka aplikasi emel anda dengan butiran di atas. Tiada apa dihantar sehingga anda tekan Hantar di sana.</p>
+      )}
       {formError && (
         <p className="form-error" role="alert">
           {formError}
         </p>
       )}
       <button className="btn btn-block" type="submit" disabled={status === 'sending'}>
-        {status === 'sending' ? 'Menghantar…' : 'Hantar pertanyaan'}
+        {status === 'sending' ? 'Menghantar…' : PAYMENTS_ENABLED ? 'Hantar pertanyaan' : 'Hantar melalui emel'}
       </button>
     </form>
   );

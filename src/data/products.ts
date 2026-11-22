@@ -222,7 +222,7 @@ export const products: Product[] = [
       {
         topic: 'Sokongan',
         question: 'Sokongan group berjalan bagaimana?',
-        answer: 'Anda boleh bertanya dalam group Telegram selama 14 hari. Saya jawab pada [waktu sokongan].',
+        answer: 'Anda boleh bertanya dalam group Telegram selama 14 hari. Saya jawab pada 9:00 pagi hingga 12:00 tengah hari.',
       },
       {
         topic: 'Masterclass',

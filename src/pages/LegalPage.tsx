@@ -1,16 +1,18 @@
 import type { LegalDoc } from '../content/legal';
 import { site } from '../data/site';
+import { PageHead } from '../components/PageHead';
 
 export function LegalPage({ doc }: { doc: LegalDoc }) {
   return (
-    <section className="legal" aria-labelledby="legal-title">
-      <div className="frame legal-grid">
-        <div className="legal-side">
-          <h1 id="legal-title" className="t-2">
-            {doc.title}
-          </h1>
-          <p className="legal-updated">Kemas kini terakhir: {site.lastUpdated}</p>
+    <>
+      <PageHead id="legal-title" title={doc.title}>
+        <p className="t-3">{doc.lead}</p>
+        <p className="legal-updated">Kemas kini terakhir: {site.lastUpdated}</p>
+      </PageHead>
+      <section className="legal" aria-label={`Kandungan ${doc.title}`}>
+        <div className="frame legal-grid">
           <nav aria-label="Kandungan halaman" className="legal-toc">
+            <h2 className="legal-toc-title">Dalam halaman ini</h2>
             <ol>
               {doc.sections.map((s) => (
                 <li key={s.id}>
@@ -19,19 +21,19 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
               ))}
             </ol>
           </nav>
+          <div className="legal-body">
+            {doc.intro}
+            {doc.sections.map((s) => (
+              <section key={s.id} id={s.id} aria-labelledby={`${s.id}-h`}>
+                <h2 id={`${s.id}-h`} className="legal-h">
+                  {s.title}
+                </h2>
+                {s.body}
+              </section>
+            ))}
+          </div>
         </div>
-        <div className="legal-body">
-          {doc.intro}
-          {doc.sections.map((s) => (
-            <section key={s.id} id={s.id} aria-labelledby={`${s.id}-h`}>
-              <h2 id={`${s.id}-h`} className="legal-h">
-                {s.title}
-              </h2>
-              {s.body}
-            </section>
-          ))}
-        </div>
-      </div>
-    </section>
+      </section>
+    </>
   );
 }

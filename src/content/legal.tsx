@@ -15,6 +15,8 @@ export interface LegalSection {
 
 export interface LegalDoc {
   title: string;
+  /** One line under the title saying what the page is. */
+  lead: string;
   intro?: ReactNode;
   sections: LegalSection[];
 }
@@ -23,6 +25,7 @@ const Email = () => <a href={`mailto:${site.email}`}>{site.email}</a>;
 
 export const terma: LegalDoc = {
   title: 'Terma & Syarat',
+  lead: 'Syarat pembelian produk digital, kelas dan perkhidmatan di growthbridge.ai.',
   sections: [
     {
       id: 'siapa-kami',
@@ -152,6 +155,7 @@ export const terma: LegalDoc = {
 
 export const privasi: LegalDoc = {
   title: 'Notis Privasi',
+  lead: 'Data yang kami kumpul, kenapa, siapa yang menerimanya, dan hak anda.',
   intro: <p>Notis ini dikeluarkan menurut Akta Perlindungan Data Peribadi 2010.</p>,
   sections: [
     {
@@ -266,6 +270,7 @@ export const privasi: LegalDoc = {
 
 export const bayaranBalik: LegalDoc = {
   title: 'Polisi Bayaran Balik',
+  lead: 'Bila bayaran balik diberi, janji baiki atau pulang, dan cara memohon.',
   sections: [
     {
       id: 'produk-digital',

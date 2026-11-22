@@ -17,6 +17,8 @@
   --error: #ff9c8f;
 
   --font: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  /* The logo's wordmark face. Used for the name GrowthBridge only. */
+  --font-brand: Montserrat, var(--font);
 
   /* Five type sizes. */
   --t-1: clamp(2rem, 1.1rem + 3.2vw, 3.75rem);
@@ -25,7 +27,7 @@
   --t-4: 1.0625rem;
   --t-5: 0.875rem;
   /* The home hero swaps --t-1 for this, so that page still uses five sizes. */
-  --t-display: clamp(2.125rem, 0.6rem + 5.4vw, 5.5rem);
+  --t-display: clamp(2rem, 0.6rem + 5.4vw, 5.5rem);
 
   --m: clamp(16px, 3.4vw, 48px);
   --gap: clamp(8px, 1vw, 12px);
@@ -207,13 +209,9 @@ main:focus {
 /* ---------- The motif ---------- */
 
 .bars {
-  display: flex;
-  align-items: flex-end;
-  gap: 4px;
-}
-.bars > span {
-  flex: 1;
-  background: var(--green);
+  display: block;
+  width: 100%;
+  fill: var(--green);
 }
 
 /* ---------- Header ---------- */
@@ -231,13 +229,13 @@ main:focus {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-family: var(--font-brand);
+  font-weight: 600;
   font-size: var(--t-4);
   text-decoration: none;
 }
 .wordmark-mark {
-  width: 30px;
+  width: 36px;
   height: 18px;
   color: var(--green);
 }
@@ -1060,57 +1058,101 @@ main:focus {
   }
 }
 
+/* ---------- Bars that rise on load (the signature move) ---------- */
+
+.rise rect {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.rise rect:nth-child(2) {
+  animation-delay: 70ms;
+}
+.rise rect:nth-child(3) {
+  animation-delay: 140ms;
+}
+.rise rect:nth-child(4) {
+  animation-delay: 210ms;
+}
+.rise rect:nth-child(5) {
+  animation-delay: 280ms;
+}
+.rise rect:nth-child(6) {
+  animation-delay: 350ms;
+}
+@keyframes rise {
+  from {
+    transform: scaleY(0.04);
+  }
+}
+
+/* Text under a page head enters after the title, line by line. */
+.page-head-lead > *,
+.contact-list > div,
+.company-card {
+  animation: enter 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: 160ms;
+}
+.page-head-lead > :nth-child(2),
+.contact-list > div:nth-child(2) {
+  animation-delay: 240ms;
+}
+.page-head-lead > :nth-child(3),
+.contact-list > div:nth-child(3) {
+  animation-delay: 320ms;
+}
+.company-card {
+  animation-delay: 400ms;
+}
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+}
+
 /* ---------- Home ---------- */
 
-.h-hero {
-  position: relative;
-  overflow: hidden;
+.h-hero-grid {
   display: grid;
+  gap: 28px;
+  padding-block: clamp(32px, 5vw, 72px) 0;
+}
+.h-hero-title {
+  font-size: var(--t-display);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  max-width: 12.5em;
 }
 .h-hero-text {
   display: grid;
   gap: 24px;
   justify-items: start;
-  align-content: center;
-  padding-block: clamp(48px, 8vw, 120px);
-}
-.h-hero-text h1 {
-  font-size: var(--t-display);
-  line-height: 1;
-  max-width: 13.5em;
-}
-.h-hero-lead {
   max-width: 34ch;
 }
 .h-hero-bars {
-  height: 40svh;
-  margin-inline: var(--m);
-  gap: var(--gap);
+  height: clamp(160px, 30svh, 260px);
+  margin-top: 12px;
 }
 @media (min-width: 960px) {
-  .h-hero {
-    min-height: calc(92svh - var(--header-h));
+  .h-hero-grid {
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--gap);
+    row-gap: 40px;
+    min-height: calc(100svh - var(--header-h));
+    align-content: center;
+  }
+  .h-hero-title {
+    grid-column: 1 / 13;
   }
   .h-hero-text {
-    position: relative;
-    z-index: 1;
-  }
-  .h-hero-text h1,
-  .h-hero-lead {
+    grid-column: 1 / 6;
+    align-self: end;
     max-width: none;
   }
-  .h-hero-text > * {
-    width: 56%;
-  }
-  .h-hero-text > .btn {
-    width: auto;
-  }
   .h-hero-bars {
-    position: absolute;
-    right: -4vw;
-    bottom: 0;
-    width: 40vw;
-    height: 100%;
+    grid-column: 7 / 13;
+    height: clamp(260px, 40svh, 440px);
     margin: 0;
   }
 }
@@ -1127,14 +1169,27 @@ main:focus {
   display: grid;
   background: var(--surface-1);
 }
+.h-product-media {
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(20px, 3vw, 40px);
+}
+.h-product-media :focus-visible {
+  outline-color: var(--navy);
+}
+.h-product-media .teaser-video,
+.build-video .teaser-video {
+  width: min(64vw, 300px);
+  height: auto;
+}
 .h-product-img {
   width: 100%;
-  height: 100%;
+  height: auto;
+  aspect-ratio: 9 / 5;
   object-fit: cover;
-  object-position: top;
-}
-.h-product-main .h-product-img {
-  aspect-ratio: 4 / 3;
+  padding: 0 clamp(16px, 2vw, 28px) clamp(16px, 2vw, 28px);
 }
 .h-product-body {
   display: grid;
@@ -1153,11 +1208,6 @@ main:focus {
   background: var(--green);
   color: var(--on-green);
 }
-.h-product-siap .h-product-img {
-  aspect-ratio: 9 / 5;
-  height: auto;
-  padding: 0 clamp(16px, 2vw, 28px) clamp(16px, 2vw, 28px);
-}
 @media (min-width: 960px) {
   .h-products-grid {
     grid-template-columns: 7fr 5fr;
@@ -1165,16 +1215,12 @@ main:focus {
   }
   .h-product-main {
     grid-template-columns: 1fr 1fr;
-    min-height: 560px;
-  }
-  .h-product-main .h-product-img {
-    aspect-ratio: auto;
   }
   .h-product-main .h-product-body {
     align-content: end;
   }
   .h-product-siap {
-    min-height: 680px;
+    min-height: 720px;
     align-content: space-between;
   }
 }
@@ -1191,23 +1237,110 @@ main:focus {
   gap: 18px;
   max-width: 36em;
 }
+.about-pictures {
+  display: grid;
+  gap: var(--gap);
+}
+.about-pictures img {
+  width: 100%;
+  height: auto;
+}
+.about-pictures figcaption,
+.build-item figcaption {
+  margin-top: 12px;
+  color: var(--muted);
+}
+@media (min-width: 720px) {
+  .about-pictures {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 @media (min-width: 960px) {
   .about-grid {
     grid-template-columns: repeat(12, 1fr);
     column-gap: var(--gap);
+    row-gap: 64px;
   }
   .about-grid h2 {
     grid-column: 1 / 5;
   }
   .about-text {
-    grid-column: 6 / 12;
+    grid-column: 6 / 13;
   }
+  .about-pictures {
+    grid-column: 1 / 13;
+  }
+}
+
+/* ---------- Secondary pages: page head ---------- */
+
+.page-head {
+  padding-top: clamp(32px, 5vw, 72px);
+}
+.page-head-title {
+  font-size: var(--t-display);
+  line-height: 1;
+  letter-spacing: -0.035em;
+  max-width: 13em;
+}
+.page-head-lead {
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+  margin-top: 28px;
+  max-width: 46ch;
+}
+.page-head-bars {
+  height: clamp(96px, 14vw, 200px);
+  margin-top: clamp(40px, 6vw, 80px);
 }
 
 /* ---------- Siap Pasang ---------- */
 
+.build {
+  padding-block: var(--section) 0;
+}
+.build-grid {
+  display: grid;
+  gap: 40px;
+}
+.build-video {
+  background: var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 4vw, 56px);
+}
+.build-video :focus-visible {
+  outline-color: var(--navy);
+}
+.build-list {
+  display: grid;
+  gap: 32px;
+  align-content: start;
+}
+.build-item img {
+  width: 100%;
+  height: auto;
+}
+@media (min-width: 960px) {
+  .build-grid {
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--gap);
+  }
+  .build-video {
+    grid-column: 1 / 6;
+    align-self: start;
+    position: sticky;
+    top: 24px;
+  }
+  .build-list {
+    grid-column: 7 / 13;
+  }
+}
+
 .enquiry {
-  padding-block: clamp(40px, 6vw, 96px) var(--section);
+  padding-block: var(--section);
 }
 .enquiry-grid {
   display: grid;
@@ -1217,9 +1350,6 @@ main:focus {
   display: grid;
   gap: 24px;
   align-content: start;
-}
-.enquiry-next-title {
-  margin-top: 16px;
 }
 .enquiry-next {
   list-style: none;
@@ -1276,56 +1406,25 @@ main:focus {
   }
 }
 
-/* ---------- Thank you / 404 ---------- */
-
-.thanks {
-  padding-block: clamp(40px, 6vw, 96px) var(--section);
-}
-.thanks-grid {
-  display: grid;
-  gap: 48px;
-}
-.thanks-grid > div {
-  display: grid;
-  gap: 24px;
-  justify-items: start;
-  align-content: center;
-}
-.thanks-bars {
-  height: 36svh;
-  gap: var(--gap);
-}
-@media (min-width: 960px) {
-  .thanks-grid {
-    grid-template-columns: 7fr 5fr;
-    min-height: 62svh;
-  }
-  .thanks-bars {
-    height: 100%;
-    min-height: 420px;
-  }
-}
-
 /* ---------- Contact ---------- */
 
 .contact {
-  padding-block: clamp(40px, 6vw, 96px) var(--section);
+  padding-block: var(--section);
 }
 .contact-grid {
   display: grid;
   gap: 40px;
 }
-.contact-grid > div:first-child {
+.contact-list {
   display: grid;
   gap: 24px;
   align-content: start;
 }
-.contact-list {
-  display: grid;
-  gap: 16px;
-}
 .contact-list dt {
   font-weight: 650;
+}
+.contact-list dd {
+  font-size: var(--t-3);
 }
 .company-card {
   background: var(--surface-1);
@@ -1336,33 +1435,44 @@ main:focus {
 }
 @media (min-width: 960px) {
   .contact-grid {
-    grid-template-columns: 7fr 5fr;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--gap);
+  }
+  .contact-list {
+    grid-column: 1 / 7;
+  }
+  .company-card {
+    grid-column: 8 / 13;
   }
 }
 
 /* ---------- Legal ---------- */
 
 .legal {
-  padding-block: clamp(40px, 6vw, 96px) var(--section);
+  padding-block: var(--section);
 }
 .legal-grid {
   display: grid;
   gap: 40px;
 }
-.legal-side {
-  display: grid;
-  gap: 16px;
-  align-content: start;
-}
 .legal-updated {
   color: var(--muted);
+}
+.legal-toc {
+  background: var(--surface-1);
+  padding: clamp(20px, 2.4vw, 32px);
+  align-self: start;
+}
+.legal-toc-title {
+  font-size: var(--t-4);
+  font-weight: 650;
 }
 .legal-toc ol {
   list-style: none;
   padding: 0;
   display: grid;
-  gap: 6px;
-  margin-top: 16px;
+  gap: 8px;
+  margin-top: 12px;
 }
 .legal-toc a {
   color: var(--muted);
@@ -1409,11 +1519,10 @@ main:focus {
     grid-template-columns: repeat(12, 1fr);
     column-gap: var(--gap);
   }
-  .legal-side {
+  .legal-toc {
     grid-column: 1 / 5;
     position: sticky;
     top: 24px;
-    align-self: start;
   }
   .legal-body {
     grid-column: 6 / 13;
@@ -1442,9 +1551,9 @@ main:focus {
   max-width: 32ch;
 }
 .footer-brand {
+  font-family: var(--font-brand);
   font-size: var(--t-3);
-  font-weight: 650;
-  letter-spacing: -0.02em;
+  font-weight: 600;
 }
 .footer-head {
   font-size: var(--t-4);
@@ -1500,6 +1609,7 @@ main:focus {
   *::after {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
   }
   .reveal-wait {
     opacity: 1;

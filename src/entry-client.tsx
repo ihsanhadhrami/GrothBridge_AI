@@ -1,4 +1,5 @@
 import '@fontsource-variable/inter';
+import '@fontsource/montserrat/latin-600.css';
 import './styles.css';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { App } from './App';

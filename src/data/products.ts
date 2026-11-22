@@ -109,10 +109,10 @@ export const products: Product[] = [
           name: 'Simpan',
           text: 'Draf masuk ke Content Bank dalam Notion. Anda semak dan tanda Ready.',
           image: {
-            src: '/media/step-notion.webp',
-            alt: 'Content Bank Threads Queue dalam Notion, dengan status Draft dan Posted.',
-            width: 1440,
-            height: 1104,
+            src: '/media/step-notion.jpg',
+            alt: 'Content Bank Threads Queue dalam Notion: setiap baris satu post, dengan tarikh post dan status Posted, Draft atau Ready.',
+            width: 522,
+            height: 1080,
           },
         },
         {
@@ -129,10 +129,10 @@ export const products: Product[] = [
           name: 'Post',
           text: 'Zernio terbitkan ke Threads, dan Notion ditanda Posted.',
           image: {
-            src: '/media/step-threads.webp',
+            src: '/media/step-threads.jpg',
             alt: 'Post yang diterbitkan secara automatik di akaun Threads growthbridge.my.',
-            width: 1440,
-            height: 1104,
+            width: 530,
+            height: 1080,
           },
         },
       ],

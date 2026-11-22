@@ -67,7 +67,10 @@ Last updated: 2026-11-22.
 
 ### Third round (2026-11-22)
 
-- Notion and Threads stills re-cut from `media-src/teaser_1080x1920.mp4` (0.8 s and 7.3 s):
+- **Superseded:** the Notion and Threads stills are now the owner's own phone screenshots: `public/media/step-notion.jpg` (522×1080) and `step-threads.jpg` (530×1080), served as-is, never re-compressed.
+  - Product step tiles: they fill the tile width and show from the top (`object-fit: cover; object-position: top`); the Make still stays whole.
+  - Home "Tentang saya": the heading and the two phones sit on the left (cols 1–6), the text on the right (8–13). On phones they stack one per row, max 340 px wide.
+- (Earlier, now replaced) Notion and Threads stills re-cut from `media-src/teaser_1080x1920.mp4` (0.8 s and 7.3 s):
   - The crop `720x552+180+308` drops the phone status bar and the phone outline.
   - Then light denoise (`hqdn3d=3:2:0:0`), 2× Lanczos upscale, `unsharp=7:7:1.1`, saved as WebP q90 at 1440×1104.
   - The source caps the detail: the phone is ~740 px wide in the video. For truly sharp stills, use original phone screenshots.

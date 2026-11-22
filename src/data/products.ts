@@ -82,7 +82,7 @@ export const products: Product[] = [
       title: 'Autopost Threads dengan AI | GrowthBridge',
       description:
         'Sistem yang tulis, simpan dan post kandungan Threads anda ikut jadual. Starter RM89, Masterclass RM259.',
-      image: '/og/autopost-threads.png',
+      image: '/og/og-autopost-threads.png',
       imageAlt: 'Autopost Threads dengan AI: post setiap hari, ikut jadual anda. Tanpa upah sesiapa.',
     },
     hero: {

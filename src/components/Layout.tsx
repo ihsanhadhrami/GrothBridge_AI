@@ -97,7 +97,8 @@ export function Layout({ path, children }: { path: string; children: ReactNode }
             </div>
           </div>
           <p className="footer-legal">
-            © 2026 {site.company} ({site.registration})
+            © 2026 {site.company} ({site.registration}) ·{' '}
+            <a href={`mailto:${site.email}`}>{site.email}</a>
           </p>
         </div>
       </footer>

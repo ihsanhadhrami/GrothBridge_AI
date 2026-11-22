@@ -88,24 +88,30 @@ Last updated: 2026-11-22.
   Legal, contact and 404 headlines stay plain.
 - Checks: smoke 12/12, chart 9/9, bars 8/8; inspector 0 FAIL on home, product and Siap Pasang; lint 0 FAIL.
 
-## Pre-launch for CHIP review and domain switch (2026-11-23)
+## Pre-launch live on growthbridge.my for CHIP review (2026-11-23)
 
-- **Domain is now growthbridge.my** (registered at Exabytes; Cloudflare zone added). Every growthbridge.ai in the repo was replaced; the content draft was renamed to `Kandungan growthbridge.my (draf untuk semakan).md`. All absolute URLs come from `site.url` in `src/data/site.ts`.
-- **Pre-launch mode:** `PAYMENTS_ENABLED = false` in `src/config.ts`.
-  - The Starter/Masterclass tiles and `#beli` show "Pembayaran dibuka tidak lama lagi" + "Tanya melalui emel" (mailto, subject "Pertanyaan: <product> <package>", names from products.ts).
-  - The product page renders no form. The Siap Pasang form validates, then opens the visitor's email app (no-JS fallback: `action="mailto:…"`).
-  - The client bundle contains no `/api/` call (the payment code is dropped at build time).
-- **Security headers:** `public/_headers` (HSTS, CSP self-only + `mailto:` form-action, X-Frame-Options DENY, nosniff, Referrer-Policy, Permissions-Policy). CHIP's domain gets added to the CSP when checkout exists.
-- **Routes:**
-  - `wrangler.jsonc` has the custom domain `growthbridge.my`, with `workers_dev`/`preview_urls` off.
-  - www is a separate Worker, `wrangler.www.jsonc` → `worker/www-redirect.ts` (301 to the apex, keeping path + query). It's separate because static assets are served before Worker code runs, so the main Worker can't redirect www.
-- **OG images:** the old ones had "growthbridge.ai" printed on them. They're moved out of `public/` to `brand/og-old-domain/` and not shipped. The meta tags still point to `/og/growthbridge.png` and `/og/autopost-threads.png`, which 404 until the owner's new images go there (1200×630 PNG, same names).
-- **Not deployed:** on 2026-11-23 the .my registry still delegates growthbridge.my to Exabytes (`ns184/185/186.mschosting.com`), so the Cloudflare zone is pending. When it's Active:
-  - Deploy: `npm run build && npx wrangler deploy && npx wrangler deploy -c wrangler.www.jsonc`
-  - Then verify: routes return 200, www → 301, http → https, plus title, canonical and og:image per page.
-  - Wrangler also needs `npx wrangler login` (the first attempt timed out).
-- **Check at deploy:** http→https. Static assets don't run Worker code, so if `http://growthbridge.my` doesn't redirect, the zone needs "Always Use HTTPS" (SSL/TLS → Edge Certificates). That's the owner's dashboard setting.
-- **Stale in docs/PLAN.md:** lines 58 and 223 still describe .ai pricing and the 2-year minimum; the owner should update them for .my.
+**Deployed:** https://growthbridge.my (Worker `growthbridge`, version 9f90b241). The zone is Active (SSL Full strict, Always Use HTTPS on).
+
+- **Domain:** growthbridge.ai → growthbridge.my everywhere (commit e7bc0e8). All absolute URLs come from `site.url`.
+- **One Worker, both hostnames:** `wrangler.jsonc` has custom domains `growthbridge.my` and `www.growthbridge.my`, and wrangler created the DNS records. It replaced the old apex A record 103.7.9.22, with the owner's OK.
+  - `run_worker_first: true`, so `worker/index.ts` sees every request. It sends www → 301 to the apex (path and query kept), answers `/api/*` with 501 (not built), and passes everything else to the static assets.
+  - The Worker sets the security headers on every response: HSTS, CSP (own scripts only + `mailto:` form-action), X-Frame-Options DENY, Referrer-Policy strict-origin-when-cross-origin, nosniff, Permissions-Policy. `public/_headers` was removed, so there's one source.
+- **Pre-launch mode:** `PAYMENTS_ENABLED = false` (`src/config.ts`).
+  - "Beli" becomes "Pembayaran dibuka tidak lama lagi" + "Tanya melalui emel" (subject "Pertanyaan: <product> <package>", names from products.ts).
+  - The Siap Pasang form opens the visitor's email app. The client bundle has no `/api/` call.
+- **OG images:** `public/og/og-home.png` (home, legal pages, Siap Pasang, contact, thanks) and `public/og/og-autopost-threads.png` (product), both owner-supplied and printed with growthbridge.my. The old .ai images are kept, unshipped, in `brand/og-old-domain/`.
+- **Legal date:** `LEGAL_LAST_UPDATED = '23 November 2026'` (owner: set to today for pre-launch). Update it whenever legal text changes, and at Phase 6.
+- **Footer:** "© 2026 GROWTH BRIDGE ENTERPRISE (202603162028 (NS0324359-K)) · growthbridge.biz@gmail.com", plus the Polisi links (Terma, Privasi, Bayaran Balik, Hubungi).
+- **Verified live (pinned to Cloudflare's address while public DNS caches expired):**
+  - All 8 routes return 200 over HTTPS, each with its own title, canonical and og:image on growthbridge.my.
+  - www → 301 apex, and http → 301 https.
+  - The og images, sitemap.xml and robots.txt return 200; unknown paths return 404. The built output has 0 matches for growthbridge.ai.
+  - Lighthouse mobile, `/` and the product page: Perf 98, A11y 100, BP 93, SEO 92. The BP and SEO points are lost only to zone features below.
+- **Zone features the owner may want to change (dashboard, not repo):**
+  - Cloudflare Web Analytics auto-injects `static.cloudflareinsights.com/beacon.min.js`, which the CSP blocks (console error).
+  - Managed robots.txt prepends `Content-Signal:` lines that Lighthouse flags as unknown.
+- **Deploy command:** `npm run build && npx wrangler deploy`
+- **Stale in docs/PLAN.md:** lines 58 and 223 still describe .ai pricing and the 2-year minimum.
 
 ## Decisions made with the owner
 

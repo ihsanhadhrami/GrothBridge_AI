@@ -8,13 +8,16 @@
     // /terma.html is served at /terma; /index.html at /.
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "404-page",
-    // Only the API reaches the Worker; every page is a static file.
-    "run_worker_first": ["/api/*"]
+    // The Worker runs first for every request: it 301s www to the apex and
+    // adds the security headers, then hands pages to the static assets.
+    "run_worker_first": true
   },
-  // The apex only. www is a separate Worker (wrangler.www.jsonc) because
-  // static assets are served before any Worker code runs, so this Worker
-  // can't redirect www itself.
-  "routes": [{ "pattern": "growthbridge.my", "custom_domain": true }],
+  // Both hostnames on this one Worker; wrangler creates their DNS records.
+  // www is redirected to the apex in worker/index.ts.
+  "routes": [
+    { "pattern": "growthbridge.my", "custom_domain": true },
+    { "pattern": "www.growthbridge.my", "custom_domain": true }
+  ],
   // No duplicate copy of the site on *.workers.dev.
   "workers_dev": false,
   "preview_urls": false,

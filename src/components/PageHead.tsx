@@ -14,7 +14,7 @@ export function PageHead({ id, title, children }: { id: string; title: string; c
           {title}
         </h1>
         {children && <div className="page-head-lead">{children}</div>}
-        <Bars className="page-head-bars rise" />
+        <Bars className="page-head-bars" live />
       </div>
     </section>
   );

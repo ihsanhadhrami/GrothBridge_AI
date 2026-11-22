@@ -26,7 +26,7 @@ export function HomePage() {
               Lihat produk
             </a>
           </div>
-          <Bars className="h-hero-bars rise" />
+          <Bars className="h-hero-bars" live />
         </div>
       </section>
 

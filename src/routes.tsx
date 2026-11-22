@@ -76,7 +76,7 @@ export const routes: RouteDef[] = [
     meta: {
       path: '/bayaran-balik',
       title: 'Polisi Bayaran Balik | GrowthBridge',
-      description: 'Bila bayaran balik diberi, janji baiki atau pulang, dan cara memohon.',
+      description: 'Bila bayaran balik diberi, proses troubleshooting atau refund, dan cara memohon.',
       type: 'article',
     },
     render: () => <LegalPage doc={bayaranBalik} />,

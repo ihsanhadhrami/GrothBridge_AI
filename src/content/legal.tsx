@@ -271,7 +271,7 @@ export const privasi: LegalDoc = {
 
 export const bayaranBalik: LegalDoc = {
   title: 'Polisi Bayaran Balik',
-  lead: 'Bila bayaran balik diberi, janji baiki atau pulang, dan cara memohon.',
+  lead: 'Bila bayaran balik diberi, proses troubleshooting atau refund, dan cara memohon.',
   sections: [
     {
       id: 'produk-digital',
@@ -284,8 +284,8 @@ export const bayaranBalik: LegalDoc = {
       ),
     },
     {
-      id: 'baiki-atau-pulang',
-      title: 'Janji baiki atau pulang',
+      id: 'troubleshooting-atau-refund',
+      title: 'Proses troubleshooting atau refund',
       body: (
         <>
           <p>
@@ -295,7 +295,7 @@ export const bayaranBalik: LegalDoc = {
             bayaran penuh.
           </p>
           <p>
-            Janji ini tidak meliputi masalah yang berpunca daripada perubahan, gangguan atau had pelan
+            Proses ini tidak meliputi masalah yang berpunca daripada perubahan, gangguan atau had pelan
             perkhidmatan pihak ketiga (Threads, Notion, Make, Zernio, ChatGPT atau Claude).
           </p>
         </>
@@ -336,7 +336,7 @@ export const bayaranBalik: LegalDoc = {
       body: (
         <p>
           Emel <Email /> dengan nombor pesanan anda. Untuk caj berganda atau akses yang tidak sampai, mohon
-          dalam 7 hari dari tarikh pembelian. Untuk janji baiki atau pulang, mohon dalam tempoh sokongan 14
+          dalam 7 hari dari tarikh pembelian. Untuk proses troubleshooting atau refund, mohon dalam tempoh sokongan 14
           hari dari tarikh pembelian. Bayaran balik yang diluluskan dihantar melalui kaedah bayaran asal dalam 14 hari bekerja.
           Akses kepada bahan dan group sokongan akan ditarik balik.
         </p>

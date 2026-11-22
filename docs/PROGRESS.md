@@ -51,12 +51,26 @@ Last updated: 2026-11-22.
   - Inspector 0 FAIL on product, contact and privacy. Lint 0 FAIL.
   - Lighthouse on the product page: 84–92 performance over 3 runs (local noise; the chart is below the fold and adds ~1 kB of JS), 100/100/100 for the rest, CLS 0.
 
+### Second round (2026-11-22)
+
+- The logo bars on the home hero and every page head are now live (`<Bars live />` in `src/components/Mark.tsx`):
+  - Rise: left to right, 90 ms apart, settling after a 3.5% overshoot. Done in CSS, so it plays before JS loads.
+  - Glint: one lighter-green pass across the bars once they've landed.
+  - Pointer: with a mouse, the bars under the pointer grow toward it (up to 7%, falling off over about 1.5 bars).
+  - Click or tap: a growth pulse runs across all six.
+  - Nothing loops; reduced motion shows still bars. The footer and product-card bars stay still.
+- The refund section "Janji baiki atau pulang" is now "Proses troubleshooting atau refund" (anchor `#troubleshooting-atau-refund`), with matching wording in the lead, the meta description and "Cara memohon".
+- Checks:
+  - Bars motion test 8/8. Smoke 12/12. Chart motion 9/9.
+  - Inspector 0 FAIL on home, refund and Siap Pasang. Lint 0 FAIL.
+  - Lighthouse on home: the new build and the previous commit both score 94/88/88 across 3 runs on this machine, so the variance is local noise. A11y/BP/SEO 100, CLS 0.
+
 ## Decisions made with the owner
 
 - (2026-11-21) Missing Notion row: in Phase 3 the webhook creates the row if it's missing, built from the CHIP purchase itself. So **Phase 2 must put on the CHIP purchase: buyer name, email and phone, reference = order ID, and the product and package.** The Worker is the only thing that ever creates order rows; Make only updates them. Accepted gap: Notion fails at checkout AND the webhook is missed → the cron can't see the order (the checkout Telegram alert still fires).
 - (2026-11-21) Refunds: a missed `payment.refunded` isn't auto-recovered. Rule: refund in CHIP, then tick Revoke access straight away.
 - (2026-11-21) Prerendering: a small build step, no framework. `renderToString` + `hydrateRoot`; routes come from the products file.
-- (2026-11-21) Contact email growthbridge.biz@gmail.com. Refund policy: no refund after access is sent, plus "Janji baiki atau pulang" (wording drafted, **owner to review**).
+- (2026-11-21) Contact email growthbridge.biz@gmail.com. Refund policy: no refund after access is sent, plus a fix-or-refund section, named "Proses troubleshooting atau refund" by the owner (2026-11-22).
 - (2026-11-22) No job title in the bio. Telegram support hours: 9:00 pagi hingga 12:00 tengah hari.
 - (2026-11-22) No registered address on the site. Retention 7 years from the end of the relevant year (LHDN). Enquiry deletion 12 months (owner's choice). Legal date set at Phase 6.
 
@@ -71,7 +85,6 @@ Last updated: 2026-11-22.
 ## Waiting for the owner (remind every phase)
 
 - `LEGAL_LAST_UPDATED` in `src/data/site.ts`: fill in at Phase 6, on the day live CHIP keys go on after the test purchase. The build prints a reminder while it's null.
-- Review the "Janji baiki atau pulang" wording in `src/content/legal.tsx`.
 - Optional: a video version that ends on growthbridge.ai instead of "DM @ihsaaann__".
 
 ## How to run

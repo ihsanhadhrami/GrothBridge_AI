@@ -58,7 +58,8 @@ export interface Product {
   /** Home page card. */
   card: { summary: string; cta: string };
   seo: { title: string; description: string; image: string; imageAlt: string };
-  hero: { title: string; tagline: string; lead: string; cta: string };
+  /** titleMark: the opening words of the title, set on a green slab. */
+  hero: { title: string; titleMark?: string; tagline: string; lead: string; cta: string };
   problem: { title: string; body: string; turn: string };
   steps: { title: string; items: Step[]; note: string };
   demo: { caption: string; videoSrc: string; posterSrc: string; label: string };
@@ -86,6 +87,7 @@ export const products: Product[] = [
     },
     hero: {
       title: 'Post setiap hari, ikut jadual anda.',
+      titleMark: 'Post setiap hari,',
       tagline: 'Ikut suara brand anda. Tanpa upah sesiapa.',
       lead: 'Sistem yang tulis, simpan dan post kandungan Threads anda ikut jadual. Anda semak, sistem yang post.',
       cta: 'Pilih pakej',
@@ -109,8 +111,8 @@ export const products: Product[] = [
           image: {
             src: '/media/step-notion.webp',
             alt: 'Content Bank Threads Queue dalam Notion, dengan status Draft dan Posted.',
-            width: 740,
-            height: 630,
+            width: 1440,
+            height: 1104,
           },
         },
         {
@@ -129,8 +131,8 @@ export const products: Product[] = [
           image: {
             src: '/media/step-threads.webp',
             alt: 'Post yang diterbitkan secara automatik di akaun Threads growthbridge.my.',
-            width: 740,
-            height: 630,
+            width: 1440,
+            height: 1104,
           },
         },
       ],

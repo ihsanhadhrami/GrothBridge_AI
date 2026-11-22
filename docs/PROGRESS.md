@@ -65,6 +65,20 @@ Last updated: 2026-11-22.
   - Inspector 0 FAIL on home, refund and Siap Pasang. Lint 0 FAIL.
   - Lighthouse on home: the new build and the previous commit both score 94/88/88 across 3 runs on this machine, so the variance is local noise. A11y/BP/SEO 100, CLS 0.
 
+### Third round (2026-11-22)
+
+- Notion and Threads stills re-cut from `media-src/teaser_1080x1920.mp4` (0.8 s and 7.3 s):
+  - The crop `720x552+180+308` drops the phone status bar and the phone outline.
+  - Then light denoise (`hqdn3d=3:2:0:0`), 2× Lanczos upscale, `unsharp=7:7:1.1`, saved as WebP q90 at 1440×1104.
+  - The source caps the detail: the phone is ~740 px wide in the video. For truly sharp stills, use original phone screenshots.
+- Step tiles now show screenshots whole (`object-fit: contain`, bottom-aligned), so no words get cropped.
+- Sales headlines open on a green slab like selected text (`src/components/Highlight.tsx`, `.hl`), wiping in once on load:
+  - home "Sistem AI dan automasi"
+  - product `hero.titleMark` "Post setiap hari,"
+  - Siap Pasang "Siap Pasang:"
+  Legal, contact and 404 headlines stay plain.
+- Checks: smoke 12/12, chart 9/9, bars 8/8; inspector 0 FAIL on home, product and Siap Pasang; lint 0 FAIL.
+
 ## Decisions made with the owner
 
 - (2026-11-21) Missing Notion row: in Phase 3 the webhook creates the row if it's missing, built from the CHIP purchase itself. So **Phase 2 must put on the CHIP purchase: buyer name, email and phone, reference = order ID, and the product and package.** The Worker is the only thing that ever creates order rows; Make only updates them. Accepted gap: Notion fails at checkout AND the webhook is missed → the cron can't see the order (the checkout Telegram alert still fires).

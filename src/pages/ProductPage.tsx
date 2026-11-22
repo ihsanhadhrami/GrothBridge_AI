@@ -3,6 +3,7 @@ import { checkoutPackages, fromPriceSen, type Package, type Product } from '../d
 import { formatRM } from '../lib/money';
 import { Bars } from '../components/Mark';
 import { TeaserVideo } from '../components/TeaserVideo';
+import { Highlight } from '../components/Highlight';
 import { ScheduleDemo } from '../components/ScheduleDemo';
 import { CheckoutForm } from '../components/CheckoutForm';
 
@@ -30,7 +31,7 @@ export function ProductPage({ product }: { product: Product }) {
           <div className="p-hero-card">
             <Bars className="card-band" />
             <h1 id="p-title" className="t-1">
-              {product.hero.title}
+              <Highlight text={product.hero.title} mark={product.hero.titleMark} />
             </h1>
             <p className="p-hero-tagline t-3">{product.hero.tagline}</p>
             <p className="p-hero-lead">{product.hero.lead}</p>

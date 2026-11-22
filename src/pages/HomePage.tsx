@@ -3,6 +3,7 @@ import { site } from '../data/site';
 import { formatRM } from '../lib/money';
 import { Bars } from '../components/Mark';
 import { TeaserVideo } from '../components/TeaserVideo';
+import { Highlight } from '../components/Highlight';
 
 export function HomePage() {
   const autopost = products[0]!;
@@ -15,7 +16,7 @@ export function HomePage() {
       <section className="h-hero" aria-labelledby="h-title">
         <div className="frame h-hero-grid">
           <h1 id="h-title" className="h-hero-title">
-            Sistem AI dan automasi untuk bisnes anda.
+            <Highlight text="Sistem AI dan automasi untuk bisnes anda." mark="Sistem AI dan automasi" />
           </h1>
           <div className="h-hero-text">
             <p className="t-3">

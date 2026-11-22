@@ -12,7 +12,7 @@ export function SiapPasangPage() {
   const stills = product.steps.items.filter((s) => s.image);
   return (
     <>
-      <PageHead id="sp-title" title="Siap Pasang: saya bina untuk anda.">
+      <PageHead id="sp-title" title="Siap Pasang: saya bina untuk anda." titleMark="Siap Pasang:">
         <p className="t-3">
           Sistem autopost Threads lengkap, dibina dalam akaun anda sendiri. {price}.
         </p>

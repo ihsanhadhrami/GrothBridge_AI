@@ -201,7 +201,7 @@ export const products: Product[] = [
         topic: 'Kos tools',
         question: 'Ada kos bulanan untuk tools ini?',
         answer:
-          'Ia bergantung pada pelan yang anda pilih dalam setiap tool. Kos itu dibayar terus kepada syarikat tool tersebut, bukan kepada Growth Bridge. [Semak dan nyatakan pelan yang manual cadangkan.]',
+          'Pelan percuma Notion sudah memadai. Make guna kira-kira 8 operasi sehari untuk 2 post, jadi semak had operasi bulanan pelan anda. Pelan dan harga setiap tool boleh berubah, dan kos itu dibayar terus kepada syarikat tool tersebut.',
       },
       {
         topic: 'Threads',
@@ -222,13 +222,13 @@ export const products: Product[] = [
       {
         topic: 'Sokongan',
         question: 'Sokongan group berjalan bagaimana?',
-        answer: 'Anda boleh bertanya dalam group Telegram selama 14 hari. Saya jawab pada 9:00 pagi hingga 12:00 tengah hari.',
+        answer: 'Anda boleh bertanya dalam group Telegram selama 14 hari dari tarikh pembelian. Saya jawab pada 9:00 pagi hingga 12:00 tengah hari.',
       },
       {
         topic: 'Masterclass',
         question: 'Bagaimana sesi Masterclass berjalan?',
         answer:
-          'Selepas bayar, anda terima pautan untuk tempah slot. Sesi 2 jam secara online, satu lawan satu. Kita setup sistem bersama dalam akaun anda. Runbook Claude diberi selepas sesi, untuk kegunaan peribadi sahaja.',
+          'Selepas bayar, anda terima pautan untuk tempah slot. Sesi 2 jam secara online, one to one session. Kita setup sistem bersama dalam akaun anda. Runbook Claude diberi selepas sesi, untuk kegunaan peribadi sahaja.',
       },
       {
         topic: 'Hasil',

@@ -122,8 +122,6 @@ export function ContactPage() {
               <strong>{site.company}</strong>
               <br />
               No. Pendaftaran: {site.registration}
-              <br />
-              {site.address}
             </p>
             <p>Untuk pertanyaan pesanan, sertakan nombor pesanan anda (contoh: GB-…).</p>
           </div>

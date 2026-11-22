@@ -84,7 +84,7 @@ export const terma: LegalDoc = {
       title: 'Sokongan',
       body: (
         <p>
-          Sokongan group Telegram tersedia selama 14 hari dari tarikh penghantaran, pada waktu yang
+          Sokongan group Telegram tersedia selama 14 hari dari tarikh pembelian, pada waktu yang
           dinyatakan dalam emel penghantaran. Sokongan meliputi setup sistem seperti dalam manual sahaja.
         </p>
       ),
@@ -94,7 +94,7 @@ export const terma: LegalDoc = {
       title: 'Masterclass',
       body: (
         <p>
-          Sesi 2 jam secara online perlu ditempah dan dihadiri dalam tempoh [60 hari] dari tarikh
+          Sesi 2 jam secara online perlu ditempah dan dihadiri dalam tempoh 60 hari dari tarikh
           pembelian. Anda boleh tukar slot sekali dengan notis sekurang-kurangnya 48 jam. Runbook Claude
           diberi selepas sesi selesai.
         </p>
@@ -229,8 +229,9 @@ export const privasi: LegalDoc = {
       title: 'Tempoh simpanan',
       body: (
         <p>
-          Rekod pesanan dan invois disimpan selama yang diperlukan oleh undang-undang cukai dan perakaunan
-          Malaysia [sahkan: 7 tahun]. Data pertanyaan yang tidak menjadi pesanan dipadam selepas [12 bulan].
+          Rekod pesanan dan invois disimpan selama 7 tahun dari akhir tahun berkaitan, seperti yang
+          diperlukan oleh undang-undang cukai Malaysia. Data pertanyaan yang tidak menjadi pesanan dipadam
+          selepas 12 bulan.
         </p>
       ),
     },
@@ -289,7 +290,7 @@ export const bayaranBalik: LegalDoc = {
         <>
           <p>
             Jika anda ikut manual langkah demi langkah tetapi sistem tidak berfungsi, beritahu kami dalam
-            group Telegram atau melalui emel dalam tempoh sokongan 14 hari. Kami akan bantu sehingga sistem
+            group Telegram atau melalui emel dalam tempoh sokongan 14 hari dari tarikh pembelian. Kami akan bantu sehingga sistem
             berfungsi dalam akaun anda. Jika kami tidak dapat menjadikannya berfungsi, kami pulangkan
             bayaran penuh.
           </p>
@@ -336,7 +337,7 @@ export const bayaranBalik: LegalDoc = {
         <p>
           Emel <Email /> dengan nombor pesanan anda. Untuk caj berganda atau akses yang tidak sampai, mohon
           dalam 7 hari dari tarikh pembelian. Untuk janji baiki atau pulang, mohon dalam tempoh sokongan 14
-          hari. Bayaran balik yang diluluskan dihantar melalui kaedah bayaran asal dalam 14 hari bekerja.
+          hari dari tarikh pembelian. Bayaran balik yang diluluskan dihantar melalui kaedah bayaran asal dalam 14 hari bekerja.
           Akses kepada bahan dan group sokongan akan ditarik balik.
         </p>
       ),

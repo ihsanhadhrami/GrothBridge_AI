@@ -631,23 +631,70 @@ main:focus {
   flex-direction: column-reverse;
   gap: 6px;
 }
-.week-stack span {
+/* A slot is one post. Empty: a dark block. Queued: outlined, waiting for
+   Make. Posted: filled from the bottom. The fill is the ::after layer so it
+   can grow without moving the outline. */
+.slot {
   flex: 1;
+  position: relative;
   background: var(--surface-2);
-  transition:
-    background-color 0.35s ease,
-    transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
   transform-origin: bottom;
+  transition: background-color 0.2s ease;
 }
-.week-stack span.is-on {
+.slot.is-queued,
+.slot.is-posted {
+  background: transparent;
+  outline: 2px solid var(--green);
+  outline-offset: -2px;
+}
+.slot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
   background: var(--green);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  /* Leaving: accelerate out, shorter than the entrance. */
+  transition: transform 0.2s cubic-bezier(0.4, 0, 1, 1);
+}
+.slot.is-posted::after {
+  transform: scaleY(1);
+  transition: transform 0.36s cubic-bezier(0.2, 0.7, 0.2, 1) var(--row-delay, 0ms);
+}
+.slot:nth-child(2) {
+  --row-delay: 90ms;
+}
+.slot:nth-child(3) {
+  --row-delay: 180ms;
+}
+.week.is-waiting .slot {
+  transform: scaleY(0.04);
 }
 .week-label {
   text-align: center;
   font-weight: 600;
+  padding-block: 4px;
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease;
 }
 .week-day.is-off .week-label {
   color: var(--muted);
+}
+/* The "today" marker the sweep carries across the week. */
+.week-day.is-now .week-label {
+  background: var(--green);
+  color: var(--on-green);
+}
+.schedule-count {
+  display: inline-block;
+  animation: count-in 0.28s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes count-in {
+  from {
+    transform: translateY(0.35em);
+    opacity: 0;
+  }
 }
 @media (min-width: 960px) {
   .schedule-grid {
@@ -1610,6 +1657,7 @@ main:focus {
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
     animation-delay: 0ms !important;
+    transition-delay: 0ms !important;
   }
   .reveal-wait {
     opacity: 1;

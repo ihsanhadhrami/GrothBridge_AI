@@ -1,3 +1,11 @@
+/**
+ * "Kemas kini terakhir" date on the legal pages. Deliberately unset: it is
+ * filled in at Phase 6, on the day the live CHIP keys go on after the test
+ * purchase (format: '14 Disember 2026'). While null, the legal pages show no
+ * date and the build prints a reminder.
+ */
+export const LEGAL_LAST_UPDATED: string | null = null;
+
 /** Business facts shown on every page. Values in [brackets] still need the owner's answer. */
 export const site = {
   url: 'https://growthbridge.ai',
@@ -8,9 +16,7 @@ export const site = {
   owner: 'Ihsan Hadhrami',
   threadsHandle: '@ihsaaann__',
   threadsUrl: 'https://www.threads.net/@ihsaaann__',
-  address: '[Alamat berdaftar SSM]',
   supportHours: '9:00 pagi hingga 12:00 tengah hari',
-  lastUpdated: '[tarikh go-live]',
   defaultImage: '/og/growthbridge.png',
   defaultImageAlt: 'GrowthBridge: sistem AI dan automasi untuk bisnes anda.',
 } as const;

@@ -15,7 +15,7 @@ if (!template.includes('<!--head-->') || !template.includes('<!--app-->')) {
   throw new Error('dist/client/index.html is missing the <!--head--> or <!--app--> marker. Run `vite build` first.');
 }
 
-const { render, pages, siteUrl } = await import(pathToFileURL(join(root, 'dist-ssr', 'entry-server.js')).href);
+const { render, pages, siteUrl, legalLastUpdated } = await import(pathToFileURL(join(root, 'dist-ssr', 'entry-server.js')).href);
 
 const outFile = (path) => {
   if (path === '/') return 'index.html';
@@ -59,4 +59,7 @@ console.log(`  sitemap.xml (${indexable.length} URLs), robots.txt`);
 if (pending.size) {
   console.log('\nPlaceholders still waiting for the owner:');
   for (const p of pending) console.log(`  [${p}]`);
+}
+if (!legalLastUpdated) {
+  console.log('\nLEGAL_LAST_UPDATED is not set (src/data/site.ts). Fill it in at Phase 6, on the day live CHIP keys go on.');
 }

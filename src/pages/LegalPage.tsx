@@ -1,5 +1,5 @@
 import type { LegalDoc } from '../content/legal';
-import { site } from '../data/site';
+import { LEGAL_LAST_UPDATED } from '../data/site';
 import { PageHead } from '../components/PageHead';
 
 export function LegalPage({ doc }: { doc: LegalDoc }) {
@@ -7,7 +7,7 @@ export function LegalPage({ doc }: { doc: LegalDoc }) {
     <>
       <PageHead id="legal-title" title={doc.title}>
         <p className="t-3">{doc.lead}</p>
-        <p className="legal-updated">Kemas kini terakhir: {site.lastUpdated}</p>
+        {LEGAL_LAST_UPDATED && <p className="legal-updated">Kemas kini terakhir: {LEGAL_LAST_UPDATED}</p>}
       </PageHead>
       <section className="legal" aria-label={`Kandungan ${doc.title}`}>
         <div className="frame legal-grid">

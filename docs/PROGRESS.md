@@ -5,7 +5,7 @@ Last updated: 2026-11-22.
 ## Status
 
 - **Phase 0: done.**
-- **Phase 1 (site, pages, prerendering): built and checked. Waiting for the owner's review.** Phase 2 doesn't start until the owner approves.
+- **Phase 1 (site, pages, prerendering): built and checked; review changes applied (2026-11-22, see below). Waiting for the owner's approval.** Phase 2 doesn't start until the owner approves.
 
 ## Phase 1: what was built
 
@@ -33,6 +33,24 @@ Last updated: 2026-11-22.
   - no page errors
 - Notes for Phase 4 CSP: the site loads no third-party scripts, fonts or images; everything is self-hosted. Inline `style` attributes: none (the bars are SVG).
 
+## Phase 1 review changes (2026-11-22)
+
+- Schedule chart redesigned with motion (motion-design skill, installed at `~/.claude/skills/motion-design`):
+  - Posts wait as outlined slots; a "today" marker walks the week and fills each one as it's posted.
+  - Primary motion: slots rise in a wave on scroll-in. Secondary: each post fills bottom-up and lifts 8px. Marker: the day label turns green.
+  - One signature curve `cubic-bezier(0.2, 0.7, 0.2, 1)` for entrances, `cubic-bezier(0.4, 0, 1, 1)` for exits. A sweep lasts ~3 s and runs only on scroll-in and after a change, so no pause control is needed.
+  - Server HTML and reduced motion show the finished week with no movement.
+- Times under the chart now read "Contoh masa: …", with the note "Masa di atas hanya contoh. Anda pilih masa sendiri."
+- No address anywhere (owner: the SSM number is enough).
+- FAQ: tool plans answer (owner's wording); Masterclass "one to one session" (replaces "satu lawan satu").
+- Legal: Masterclass 60 days; retention "7 tahun dari akhir tahun berkaitan"; enquiries deleted after 12 months; support is "14 hari dari tarikh pembelian" everywhere (manual's wording).
+- "Kemas kini terakhir" is now `LEGAL_LAST_UPDATED` in `src/data/site.ts`, null until Phase 6. While it's null, the legal pages show no date and the build prints a reminder.
+- Checks after the changes:
+  - Smoke test 12/12.
+  - Chart motion test 9/9 (queue, sweep order, progressive fill, change, day off, reduced motion, no errors).
+  - Inspector 0 FAIL on product, contact and privacy. Lint 0 FAIL.
+  - Lighthouse on the product page: 84–92 performance over 3 runs (local noise; the chart is below the fold and adds ~1 kB of JS), 100/100/100 for the rest, CLS 0.
+
 ## Decisions made with the owner
 
 - (2026-11-21) Missing Notion row: in Phase 3 the webhook creates the row if it's missing, built from the CHIP purchase itself. So **Phase 2 must put on the CHIP purchase: buyer name, email and phone, reference = order ID, and the product and package.** The Worker is the only thing that ever creates order rows; Make only updates them. Accepted gap: Notion fails at checkout AND the webhook is missed → the cron can't see the order (the checkout Telegram alert still fires).
@@ -40,6 +58,7 @@ Last updated: 2026-11-22.
 - (2026-11-21) Prerendering: a small build step, no framework. `renderToString` + `hydrateRoot`; routes come from the products file.
 - (2026-11-21) Contact email growthbridge.biz@gmail.com. Refund policy: no refund after access is sent, plus "Janji baiki atau pulang" (wording drafted, **owner to review**).
 - (2026-11-22) No job title in the bio. Telegram support hours: 9:00 pagi hingga 12:00 tengah hari.
+- (2026-11-22) No registered address on the site. Retention 7 years from the end of the relevant year (LHDN). Enquiry deletion 12 months (owner's choice). Legal date set at Phase 6.
 
 ## Deviations from the content draft (owner to confirm in review)
 
@@ -47,18 +66,13 @@ Last updated: 2026-11-22.
 - The product hero is split: h1 "Post setiap hari, ikut jadual anda." with "Ikut suara brand anda. Tanpa upah sesiapa." under it.
 - The demo video is in the product hero, the home product card and the Siap Pasang page, not in a separate Demo section.
 - The Siap Pasang page title "Siap Pasang: saya bina untuk anda." and its copy were written from facts already in the draft.
-- The schedule picker's 3-a-day time (12:30 tengah hari) is an example; 7:30 and 8:47 malam are real (from the video).
+- The schedule picker's times are labelled as examples on the page; 7:30 and 8:47 malam come from the video.
 
-## Waiting for the owner (remind every phase; block deploy on the legal ones)
+## Waiting for the owner (remind every phase)
 
-`npm run build` prints the remaining placeholders:
-- `[Semak dan nyatakan pelan yang manual cadangkan.]`: FAQ, `src/data/products.ts`
-- `[tarikh go-live]`: `src/data/site.ts`
-- `[60 hari]`: Terma §7, `src/content/legal.tsx`
-- `[sahkan: 7 tahun]`, `[12 bulan]`: Privasi §6, `src/content/legal.tsx`
-- `[Alamat berdaftar SSM]`: `src/data/site.ts`
-- Review the "Janji baiki atau pulang" wording in `src/content/legal.tsx`
-- Optional: a video version that ends on growthbridge.ai instead of "DM @ihsaaann__"
+- `LEGAL_LAST_UPDATED` in `src/data/site.ts`: fill in at Phase 6, on the day live CHIP keys go on after the test purchase. The build prints a reminder while it's null.
+- Review the "Janji baiki atau pulang" wording in `src/content/legal.tsx`.
+- Optional: a video version that ends on growthbridge.ai instead of "DM @ihsaaann__".
 
 ## How to run
 

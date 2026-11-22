@@ -71,6 +71,12 @@ Last updated: 2026-11-22.
   - The crop `720x552+180+308` drops the phone status bar and the phone outline.
   - Then light denoise (`hqdn3d=3:2:0:0`), 2× Lanczos upscale, `unsharp=7:7:1.1`, saved as WebP q90 at 1440×1104.
   - The source caps the detail: the phone is ~740 px wide in the video. For truly sharp stills, use original phone screenshots.
+- Teaser video re-encoded without the phone status bar:
+  - While the phone is on screen (0–13.97 s, then a hard cut), a 6-px strip of the phone's own background (y 303) is stretched over the status bar area (670×66 at 215,237) on every frame.
+  - The patch matches both the Notion and the Threads background, and the transition between them.
+  - Encoded as before (720×1280, CRF 27, faststart); poster re-cut at 0.5 s. A frame scan finds 0 frames with the red time pill.
+  - The original stays untouched in `media-src/`. Re-encode command:
+    `ffmpeg -i media-src/teaser_1080x1920.mp4 -an -filter_complex "[0:v]split[base][src];[src]crop=670:6:215:303,scale=670:66:flags=bilinear[patch];[base][patch]overlay=215:237:enable='lt(t,13.985)',scale=720:1280:flags=lanczos" -c:v libx264 -profile:v high -preset slow -crf 27 -pix_fmt yuv420p -movflags +faststart public/media/teaser-720.mp4`
 - Step tiles now show screenshots whole (`object-fit: contain`, bottom-aligned), so no words get cropped.
 - Sales headlines open on a green slab like selected text (`src/components/Highlight.tsx`, `.hl`), wiping in once on load:
   - home "Sistem AI dan automasi"

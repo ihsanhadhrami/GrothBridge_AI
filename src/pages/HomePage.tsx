@@ -97,6 +97,13 @@ export function HomePage() {
               untuk akaun saya sendiri. Apa yang anda beli ialah apa yang saya pakai.
             </p>
             <p>
+              Kenali latar belakang saya di{' '}
+              <a href={site.ownerBackgroundUrl} rel="noopener">
+                ihsanhadhrami.com
+              </a>
+              .
+            </p>
+            <p>
               Ikuti saya di Threads:{' '}
               <a href={site.threadsUrl} rel="noopener">
                 {site.threadsHandle}

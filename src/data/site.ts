@@ -15,6 +15,8 @@ export const site = {
   owner: 'Ihsan Hadhrami',
   threadsHandle: '@ihsaaann__',
   threadsUrl: 'https://www.threads.net/@ihsaaann__',
+  /** The owner's personal site: full background, linked from "Tentang saya". */
+  ownerBackgroundUrl: 'https://ihsanhadhrami.com/about/background',
   supportHours: '9:00 pagi hingga 12:00 tengah hari',
   defaultImage: '/og/og-home.png',
   defaultImageAlt: 'GrowthBridge: sistem AI dan automasi untuk bisnes anda.',

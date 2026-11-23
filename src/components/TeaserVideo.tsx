@@ -105,7 +105,7 @@ export function TeaserVideo({ src, poster, label }: Props) {
         onPause={() => setPlaying(false)}
       />
       <button type="button" className="teaser-toggle teaser-sound" onClick={toggleSound} aria-pressed={soundOn}>
-        {soundOn ? 'Matikan suara' : 'Hidupkan suara'}
+        {soundOn ? 'Voice Off' : 'Voice On'}
       </button>
       <button type="button" className="teaser-toggle" onClick={toggle} aria-pressed={!playing}>
         {playing ? 'Pause video' : 'Play video'}

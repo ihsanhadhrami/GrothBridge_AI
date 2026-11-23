@@ -120,6 +120,15 @@ export function ProductPage({ product }: { product: Product }) {
               <PackageTile key={p.id} productName={product.name} pkg={p} index={i} onChoose={choose} />
             ))}
           </div>
+          {product.packagesFit && (
+            <p className="pricing-fit">
+              {product.packagesFit.map((f) => (
+                <span key={f.label}>
+                  <strong>{f.label}</strong> {f.text}
+                </span>
+              ))}
+            </p>
+          )}
           <p className="pricing-note">{product.packagesNote}</p>
         </div>
       </section>
@@ -144,15 +153,31 @@ export function ProductPage({ product }: { product: Product }) {
             {product.faq.map((f, i) => (
               <details key={f.question} className="faq-item" open={i === 0} name="faq">
                 <summary>{f.question}</summary>
-                <p>
-                  {f.topic === 'Bayaran balik' ? (
-                    <>
-                      Sila baca <a href="/bayaran-balik">Polisi Bayaran Balik</a> sebelum membeli.
-                    </>
-                  ) : (
-                    f.answer
-                  )}
-                </p>
+                {f.blocks ? (
+                  <div className="faq-answer">
+                    {f.blocks.map((block, j) =>
+                      Array.isArray(block) ? (
+                        <ul key={j}>
+                          {block.map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p key={j}>{block}</p>
+                      ),
+                    )}
+                  </div>
+                ) : (
+                  <p>
+                    {f.topic === 'Bayaran balik' ? (
+                      <>
+                        Sila baca <a href="/bayaran-balik">Polisi Bayaran Balik</a> sebelum membeli.
+                      </>
+                    ) : (
+                      f.answer
+                    )}
+                  </p>
+                )}
               </details>
             ))}
           </div>

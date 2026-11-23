@@ -49,7 +49,10 @@ export interface Faq {
   /** One or two words, used as the card's tab. */
   topic: string;
   question: string;
-  answer: string;
+  /** One-paragraph answer. */
+  answer?: string;
+  /** Longer answer, rendered instead of `answer`: strings are paragraphs, arrays are bullet lists. */
+  blocks?: (string | string[])[];
 }
 
 export interface Product {
@@ -65,6 +68,8 @@ export interface Product {
   demo: { caption: string; videoSrc: string; posterSrc: string; label: string };
   packagesTitle: string;
   packagesNote: string;
+  /** Small note under the package tiles: who the product suits, and who it doesn't. */
+  packagesFit?: { label: string; text: string }[];
   packages: Package[];
   faqTitle: string;
   faq: Faq[];
@@ -81,15 +86,15 @@ export const products: Product[] = [
     seo: {
       title: 'Autopost Threads dengan AI | GrowthBridge',
       description:
-        'Sistem yang tulis, simpan dan post kandungan Threads anda ikut jadual. Starter RM89, Masterclass RM259.',
+        'Sistem yang simpan dan post kandungan Threads anda ikut jadual. Starter RM89, Masterclass RM259.',
       image: '/og/og-autopost-threads.png',
       imageAlt: 'Autopost Threads dengan AI: post setiap hari, ikut jadual anda. Tanpa upah sesiapa.',
     },
     hero: {
       title: 'Post setiap hari, ikut jadual anda.',
       titleMark: 'Post setiap hari,',
-      tagline: 'Ikut suara brand anda. Tanpa upah sesiapa.',
-      lead: 'Sistem yang tulis, simpan dan post kandungan Threads anda ikut jadual. Anda semak, sistem yang post.',
+      tagline: 'Tulisan anda sendiri. Tanpa upah sesiapa.',
+      lead: 'Sistem yang simpan dan post kandungan Threads anda ikut jadual. Anda tulis dan semak, sistem yang post.',
       cta: 'Pilih pakej',
     },
     problem: {
@@ -102,12 +107,12 @@ export const products: Product[] = [
       items: [
         {
           name: 'Tulis',
-          text: 'ChatGPT atau Claude tulis draf ikut suara brand anda.',
+          text: 'Anda tulis post sendiri, atau guna ChatGPT/Claude anda dengan brief brand dan prompt siap guna dalam manual.',
           quote: 'Pengetahuan boleh bertambah, tapi skill belum tentu ikut bertambah.',
         },
         {
           name: 'Simpan',
-          text: 'Draf masuk ke Content Bank dalam Notion. Anda semak dan tanda Ready.',
+          text: 'Anda simpan post dalam Content Bank di Notion, semak, dan tanda Ready.',
           image: {
             src: '/media/step-notion.jpg',
             alt: 'Content Bank Threads Queue dalam Notion: setiap baris satu post, dengan tarikh post dan status Posted, Draft atau Ready.',
@@ -147,6 +152,10 @@ export const products: Product[] = [
     },
     packagesTitle: 'Pilih pakej anda',
     packagesNote: 'Pelan jagaan untuk Siap Pasang tersedia dari RM300/bulan (pilihan).',
+    packagesFit: [
+      { label: 'Sesuai untuk:', text: 'yang mahu post setiap hari secara konsisten.' },
+      { label: 'Kurang sesuai untuk:', text: 'yang hanya post beberapa kali seminggu.' },
+    ],
     packages: [
       {
         id: 'starter',
@@ -189,6 +198,29 @@ export const products: Product[] = [
     ],
     faqTitle: 'Soalan lazim',
     faq: [
+      {
+        topic: 'Scheduler',
+        question: 'Kenapa tak guna scheduler Threads sahaja?',
+        blocks: [
+          'Boleh, dan ia percuma. Kalau anda post 2–3 kali seminggu, scheduler Threads sudah memadai dan anda tak perlu sistem ini.',
+          'Bezanya: dengan scheduler Threads, anda perlu buka app dan jadualkan setiap post satu demi satu. Dengan sistem ini, anda tulis banyak post sekali gus dan simpan dalam satu content bank di Notion. Selepas itu sistem post sendiri setiap hari ikut jadual. Kerja anda cuma semak dan tanda Ready.',
+        ],
+      },
+      {
+        topic: 'AI',
+        question: 'Kenapa tak suruh AI terus post ke Threads?',
+        blocks: [
+          'Boleh dibuat, tapi kami tak cadangkan. Bila AI yang sama menulis dan terus menerbitkan, tiada langkah untuk anda semak dulu, jadi post yang anda belum baca boleh keluar.',
+          'Sistem ini pisahkan kerja:',
+          [
+            'Anda tulis post, sendiri atau dengan bantuan AI.',
+            'Notion tempat anda semak dan luluskan.',
+            'Make jalankan jadual, setiap hari, langkah yang sama.',
+            'Zernio hantar post ke Threads.',
+          ],
+          'Hanya post bertanda Ready yang akan keluar. Kalau satu langkah gagal, post tak keluar dan status dalam Notion menunjukkannya.',
+        ],
+      },
       {
         topic: 'Coding',
         question: 'Perlu pandai coding?',

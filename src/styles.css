@@ -847,6 +847,16 @@ main:focus {
   color: var(--ink);
 }
 
+.pricing-fit {
+  margin-top: 24px;
+  display: grid;
+  gap: 4px;
+  color: var(--muted);
+}
+.pricing-fit strong {
+  color: var(--ink);
+  font-weight: 600;
+}
 .pricing-note {
   margin-top: 24px;
   color: var(--muted);
@@ -1137,9 +1147,34 @@ main:focus {
 .faq-item summary:hover {
   color: var(--green);
 }
-.faq-item p {
+.faq-item > p,
+.faq-answer {
   padding: 0 24px 24px;
   max-width: 60ch;
+}
+/* Longer answers: paragraphs plus a bullet list (same bullet as the legal pages). */
+.faq-answer {
+  display: grid;
+  gap: 12px;
+}
+.faq-answer ul {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.faq-answer li {
+  position: relative;
+  padding-left: 22px;
+}
+.faq-answer li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.32em;
+  width: 8px;
+  height: 0.9em;
+  background: var(--green);
 }
 @media (min-width: 960px) {
   .faq-grid {

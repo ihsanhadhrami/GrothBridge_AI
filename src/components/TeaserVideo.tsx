@@ -108,7 +108,7 @@ export function TeaserVideo({ src, poster, label }: Props) {
         {soundOn ? 'Matikan suara' : 'Hidupkan suara'}
       </button>
       <button type="button" className="teaser-toggle" onClick={toggle} aria-pressed={!playing}>
-        {playing ? 'Jeda video' : 'Main video'}
+        {playing ? 'Pause video' : 'Play video'}
       </button>
     </figure>
   );

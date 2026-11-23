@@ -354,6 +354,18 @@ main:focus {
 .teaser-toggle:hover {
   background: var(--surface-2);
 }
+/* Sound button sits bottom-left, opposite pause/play. Green while sound is on. */
+.teaser-sound {
+  right: auto;
+  left: 10px;
+}
+.teaser-sound[aria-pressed='true'] {
+  background: var(--green);
+  color: var(--on-green);
+}
+.teaser-sound[aria-pressed='true']:hover {
+  background: var(--green-hover);
+}
 
 @media (min-width: 960px) {
   .p-hero-grid {

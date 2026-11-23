@@ -88,6 +88,19 @@ Last updated: 2026-11-22.
   Legal, contact and 404 headlines stay plain.
 - Checks: smoke 12/12, chart 9/9, bars 8/8; inspector 0 FAIL on home, product and Siap Pasang; lint 0 FAIL.
 
+## Teaser voice-over (2026-11-23)
+
+- The owner's ElevenLabs voice-over (37.1 s; source kept unshipped as `media-src/teaser-voiceover.mp3`) is retimed onto the teaser. `public/media/teaser-720.mp4` is now 41 s with AAC mono audio, about 1.6 MB.
+- Method (`media-src/teaser-voiceover-plan.py`):
+  - The voice is cut at its natural pauses into 12 phrases, matched by Whisper transcript to the 10 caption scenes.
+  - Each phrase starts 0.1 s after its scene appears, at least 0.2 s after the previous one. No tempo or pitch change.
+  - Two long inner pauses are shortened: after "Anda", and inside "Se…tiap".
+  - The end card is held 1 s longer so the last line ("…DM … di Threads") isn't cut. The audio is levelled with loudnorm to about −16 LUFS.
+  - The status-bar cover is unchanged.
+- Player (`TeaserVideo`): still autoplays muted (browser rule). A new "Hidupkan suara" button (bottom-left, `aria-pressed`) unmutes and restarts from 0 so the voice plays in sync; pressing it again mutes. If the browser refuses sound, it falls back to muted.
+- Re-encode command (from the repo root, with the graph from the plan script):
+  `ffmpeg -i media-src/teaser_1080x1920.mp4 -i media-src/teaser-voiceover.mp3 -filter_complex "<status-bar patch>,tpad=stop_mode=clone:stop_duration=1,scale=720:1280 ; <voice graph>" -c:v libx264 -crf 27 -c:a aac -b:a 96k -ac 1 -movflags +faststart -t 41 public/media/teaser-720.mp4`
+
 ## Pre-launch live on growthbridge.my for CHIP review (2026-11-23)
 
 **Deployed:** https://growthbridge.my (Worker `growthbridge`, version 9f90b241). The zone is Active (SSL Full strict, Always Use HTTPS on).

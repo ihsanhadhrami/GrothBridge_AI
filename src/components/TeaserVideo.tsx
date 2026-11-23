@@ -7,15 +7,19 @@ interface Props {
 }
 
 /**
- * Muted, looping product clip. Nothing downloads until the page has loaded
- * and the clip is on screen (keeps the first paint light). Under
- * prefers-reduced-motion it never autoplays. A visible button pauses it
- * (WCAG 2.2.2).
+ * Looping product clip with a voice-over. It autoplays muted (browsers block
+ * autoplay with sound). Nothing downloads until the page has loaded and the
+ * clip is on screen, which keeps the first paint light. Under
+ * prefers-reduced-motion it never autoplays.
+ * Two buttons: pause/play (WCAG 2.2.2), and sound on/off. Turning the sound
+ * on restarts the clip, so the voice-over is heard from the first line in
+ * sync with the picture.
  */
 export function TeaserVideo({ src, poster, label }: Props) {
   const ref = useRef<HTMLVideoElement>(null);
   const [playing, setPlaying] = useState(false);
   const [userPaused, setUserPaused] = useState(false);
+  const [soundOn, setSoundOn] = useState(false);
   const userPausedRef = useRef(userPaused);
   userPausedRef.current = userPaused;
 
@@ -64,6 +68,26 @@ export function TeaserVideo({ src, poster, label }: Props) {
     }
   };
 
+  const toggleSound = () => {
+    const video = ref.current;
+    if (!video) return;
+    if (soundOn) {
+      video.muted = true;
+      setSoundOn(false);
+      return;
+    }
+    if (!video.src) video.src = src;
+    video.muted = false;
+    video.currentTime = 0;
+    setSoundOn(true);
+    setUserPaused(false);
+    video.play().catch(() => {
+      // Playback with sound refused: fall back to muted so the button stays truthful.
+      video.muted = true;
+      setSoundOn(false);
+    });
+  };
+
   return (
     <figure className="teaser">
       <video
@@ -80,6 +104,9 @@ export function TeaserVideo({ src, poster, label }: Props) {
         onPlay={() => setPlaying(true)}
         onPause={() => setPlaying(false)}
       />
+      <button type="button" className="teaser-toggle teaser-sound" onClick={toggleSound} aria-pressed={soundOn}>
+        {soundOn ? 'Matikan suara' : 'Hidupkan suara'}
+      </button>
       <button type="button" className="teaser-toggle" onClick={toggle} aria-pressed={!playing}>
         {playing ? 'Jeda video' : 'Main video'}
       </button>

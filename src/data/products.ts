@@ -143,7 +143,7 @@ export const products: Product[] = [
       videoSrc: '/media/teaser-720.mp4',
       posterSrc: '/media/teaser-poster.jpg',
       label:
-        'Video 40 saat: post ditanda Ready dalam Notion, kemudian keluar sendiri di Threads pada 7:30 dan 8:47 malam, diikuti langkah setup.',
+        'Video 41 saat dengan suara latar: post ditanda Ready dalam Notion, kemudian keluar sendiri di Threads pada 7:30 dan 8:47 malam, diikuti langkah setup.',
     },
     packagesTitle: 'Pilih pakej anda',
     packagesNote: 'Pelan jagaan untuk Siap Pasang tersedia dari RM300/bulan (pilihan).',

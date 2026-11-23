@@ -1227,6 +1227,11 @@ main:focus {
 .bars.live .bar:nth-child(6) rect {
   animation-delay: 450ms, 1550ms;
 }
+/* Waiting below the screen: low and still until it scrolls into view. */
+.bars.live.is-waiting rect {
+  animation: none;
+  transform: scaleY(0.04);
+}
 .bars.live .bar.is-near rect {
   fill: var(--green-hover);
 }

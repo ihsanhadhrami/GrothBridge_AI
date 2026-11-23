@@ -51,7 +51,7 @@ export function Layout({ path, children }: { path: string; children: ReactNode }
 
       <footer className="site-footer">
         <div className="frame">
-          <Bars className="footer-bars" />
+          <Bars className="footer-bars" live />
           <div className="footer-grid">
             <div className="footer-intro">
               <p className="footer-brand">GrowthBridge</p>

@@ -29,13 +29,14 @@ export function Mark({ className }: { className?: string }) {
  * keeps the logo's proportions between bars: the gap stays 40/524 of the width
  * and each bar's height stays relative to the tallest.
  *
- * `live` (home hero, page heads) adds motion, following the motion-design
+ * `live` (home hero, page heads, footer) adds motion, following the motion-design
  * skill. Growth is the emotion, vertical is the path.
  *   - Primary (CSS, so it plays before JS loads): bars rise left to right
  *     and settle with a 3.5% overshoot.
  *   - Secondary (CSS): one glint runs across the bars once they've landed.
  *   - Interaction (JS): with a mouse, the bars under the pointer grow toward
  *     it; a click or tap sends a growth pulse across all six.
+ * Bars that load below the screen hold their rise until scrolled into view.
  * Nothing loops on its own, so no pause control is needed. Reduced motion:
  * still bars, no interaction.
  */
@@ -46,6 +47,23 @@ export function Bars({ className, live = false }: { className?: string; live?: b
     const svg = ref.current;
     if (!live || !svg || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const groups = Array.from(svg.querySelectorAll<SVGGElement>('.bar'));
+
+    // Bars that start below the screen (the footer) wait, low, and rise when
+    // they scroll into view, so the entrance is actually seen.
+    let entrance: IntersectionObserver | undefined;
+    if (svg.getBoundingClientRect().top > window.innerHeight) {
+      svg.classList.add('is-waiting');
+      entrance = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry?.isIntersecting) return;
+          svg.classList.remove('is-waiting'); // re-applies the CSS animation, from the start
+          entrance?.disconnect();
+        },
+        { threshold: 0.35 },
+      );
+      entrance.observe(svg);
+    }
+
     const centres = BAR_HEIGHTS.map((_, i) => (i * (BAR_W + BAR_GAP) + BAR_W / 2) / WIDTH);
     let frame = 0;
     let pointerX = 0;
@@ -91,6 +109,7 @@ export function Bars({ className, live = false }: { className?: string; live?: b
     svg.addEventListener('pointerleave', onLeave);
     svg.addEventListener('pointerdown', onPress);
     return () => {
+      entrance?.disconnect();
       cancelAnimationFrame(frame);
       svg.removeEventListener('pointermove', onMove);
       svg.removeEventListener('pointerleave', onLeave);

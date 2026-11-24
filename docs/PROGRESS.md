@@ -22,7 +22,7 @@ Last updated: 2026-11-24.
 
 - Vite 8 + React 19 + `@cloudflare/vite-plugin`, with a Worker stub in `worker/index.ts`. It answers `/api/*` with 501 and a Malay message until Phase 2. (Since 2026-11-23 it also runs first for every request; see Status.)
 - `wrangler.jsonc`: `html_handling: auto-trailing-slash`, 404 page. (`run_worker_first` was `["/api/*"]` in Phase 1; since 2026-11-23 it is `true`.)
-- `src/data/products.ts`: the single source of products and prices (in sen), page copy, FAQ, step stills and the demo video. Siap Pasang is `kind: 'enquiry'` with `displayPriceSen` only, so it can never be charged.
+- `src/data/products.ts`: the single source of products and prices (in sen), page copy, FAQ, step stills and the demo video. Siap Pasang is `kind: 'enquiry'` with a text `priceLabel` ("Dari RM1,500") and no sen price, so it can never be charged.
 - `src/lib/validate.ts`: shared form validation for the browser and, from Phase 2, the Worker. `src/lib/money.ts`: `formatRM`.
 - Prerendering: `vite.prerender.config.ts` builds `src/entry-server.tsx`. `scripts/prerender.mjs` renders every route with `renderToString` into `dist/client/<route>.html`, plus `404.html`, `sitemap.xml` and `robots.txt`. It also lists any `[placeholder]` left in the copy. The client hydrates with `hydrateRoot`.
 - Brand: the mark is measured from `brand/growthbridge-logo.png`: 6 bars, heights 0.44 / 0.549 / 0.541 / 0.757 / 1 / 0.925, bar:gap 54:40. It's drawn as SVG in `src/components/Mark.tsx`, flat green (the logo's fade is dropped; no gradients). The wordmark is in Montserrat 600, only for the name; everything else is Inter.

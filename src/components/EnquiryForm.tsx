@@ -17,7 +17,18 @@ const PACKAGE = product.packages.find((p) => p.kind === 'enquiry')?.name ?? 'Sia
  * email app opens with the details filled in, to send themselves.
  */
 export function EnquiryForm() {
-  const [v, setV] = useState({ name: '', email: '', phone: '', business: '', threads: '', message: '' });
+  const [v, setV] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    business: '',
+    threads: '',
+    // Scope questions for the quote (optional): number of Threads accounts, picture/video posts, writing help.
+    accounts: '',
+    media: '',
+    writing: '',
+    message: '',
+  });
   const [consent, setConsent] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'mailed'>('idle');
@@ -43,6 +54,9 @@ export function EnquiryForm() {
         `Telefon: ${v.phone.trim()}`,
         `Bisnes: ${v.business.trim() || '-'}`,
         `Threads: ${v.threads.trim() || '-'}`,
+        `Bilangan akaun Threads: ${v.accounts.trim() || '-'}`,
+        `Perlu post bergambar/video?: ${v.media || '-'}`,
+        `Perlu bantuan menulis kandungan?: ${v.writing || '-'}`,
         '',
         'Apa yang saya mahu automasikan:',
         v.message.trim(),
@@ -123,6 +137,20 @@ export function EnquiryForm() {
       />
       <Field id="business" label="Nama bisnes (pilihan)" autoComplete="organization" value={v.business} onChange={set('business')} error={errors.business} maxLength={120} />
       <Field id="threads" label="Akaun Threads (pilihan)" value={v.threads} onChange={set('threads')} error={errors.threads} placeholder="@namaakaun" maxLength={60} />
+      <Field
+        id="accounts"
+        label="Bilangan akaun Threads"
+        type="number"
+        inputMode="numeric"
+        min={1}
+        max={99}
+        step={1}
+        value={v.accounts}
+        onChange={set('accounts')}
+        error={errors.accounts}
+      />
+      <Choice name="media" legend="Perlu post bergambar/video?" options={['Ya', 'Tidak', 'Belum pasti']} value={v.media} onChange={(x) => setV((o) => ({ ...o, media: x }))} />
+      <Choice name="writing" legend="Perlu bantuan menulis kandungan?" options={['Ya', 'Tidak']} value={v.writing} onChange={(x) => setV((o) => ({ ...o, writing: x }))} />
       <div className="field">
         <label htmlFor="message">Apa yang anda mahu automasikan?</label>
         <textarea
@@ -157,5 +185,34 @@ export function EnquiryForm() {
         {status === 'sending' ? 'Menghantar…' : PAYMENTS_ENABLED ? 'Hantar pertanyaan' : 'Hantar melalui emel'}
       </button>
     </form>
+  );
+}
+
+/** A row of pill radios (same look as the schedule picker). Optional: nothing is selected at first. */
+function Choice({
+  name,
+  legend,
+  options,
+  value,
+  onChange,
+}: {
+  name: string;
+  legend: string;
+  options: string[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <fieldset className="choice field">
+      <legend>{legend}</legend>
+      <div className="choice-row">
+        {options.map((o) => (
+          <label key={o} className="choice-pill">
+            <input type="radio" name={name} value={o} checked={value === o} onChange={() => onChange(o)} />
+            <span>{o}</span>
+          </label>
+        ))}
+      </div>
+    </fieldset>
   );
 }

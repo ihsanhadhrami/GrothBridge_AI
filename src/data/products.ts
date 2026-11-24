@@ -29,9 +29,18 @@ export interface CheckoutPackage extends PackageBase {
 /** Not sold on the site: the button leads to an enquiry form. */
 export interface EnquiryPackage extends PackageBase {
   kind: 'enquiry';
-  /** Shown on the page only. Never charged; the final price is agreed in writing. */
-  displayPriceSen: number;
+  /**
+   * Starting price, shown as text only ("Dari RM1,500"). Deliberately not a
+   * number in sen: it is never charged, and the final price is quoted in writing.
+   */
+  priceLabel: string;
   enquiryPath: string;
+  /** What the base price covers. */
+  baseScope: string[];
+  /** Quoted on top of the base price. */
+  quotedSeparately: string[];
+  /** Optional monthly care plan, one line. */
+  carePlan: string;
 }
 
 export type Package = CheckoutPackage | EnquiryPackage;
@@ -189,8 +198,19 @@ export const products: Product[] = [
         id: 'siap-pasang',
         kind: 'enquiry',
         name: 'Siap Pasang',
-        displayPriceSen: 150000,
+        priceLabel: 'Dari RM1,500',
         enquiryPath: '/siap-pasang',
+        baseScope: [
+          '1 akaun Threads',
+          'Content bank di Notion',
+          'Jadual automatik di Make',
+          'Sambungan Zernio ke Threads',
+          'Ujian sehingga post pertama keluar',
+          'Sesi serahan 1 jam (cara guna & urus sistem)',
+          'Sokongan 14 hari',
+        ],
+        quotedSeparately: ['Akaun Threads tambahan', 'Post bergambar atau video', 'Penulisan kandungan', 'Ubah suai khas'],
+        carePlan: 'Pelan jagaan dari RM300/bulan (pilihan)',
         audience: 'Mahu siap tanpa buat sendiri',
         includes: ['Saya bina sistem lengkap dalam akaun anda'],
         cta: 'Hantar pertanyaan',

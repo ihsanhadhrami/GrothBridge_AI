@@ -60,7 +60,7 @@ export function HomePage() {
                   <h3 id="hp-siap" className="t-3">
                     Siap Pasang
                   </h3>
-                  <p className="h-product-price">{formatRM(siap.displayPriceSen)}</p>
+                  <p className="h-product-price">{siap.priceLabel}</p>
                   <p>Saya bina sistem lengkap dalam akaun anda.</p>
                   <a className="btn btn-dark" href={siap.enquiryPath}>
                     {siap.cta}

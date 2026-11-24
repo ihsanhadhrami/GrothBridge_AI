@@ -1,22 +1,55 @@
 import { site } from '../data/site';
-import { products } from '../data/products';
-import { formatRM } from '../lib/money';
+import { products, type EnquiryPackage } from '../data/products';
 import { PageHead } from '../components/PageHead';
 import { EnquiryForm } from '../components/EnquiryForm';
 import { TeaserVideo } from '../components/TeaserVideo';
 
 export function SiapPasangPage() {
   const product = products[0]!;
-  const siap = product.packages.find((p) => p.kind === 'enquiry');
-  const price = siap && siap.kind === 'enquiry' ? formatRM(siap.displayPriceSen) : '';
+  const siap = product.packages.find((p): p is EnquiryPackage => p.kind === 'enquiry');
   const stills = product.steps.items.filter((s) => s.image);
   return (
     <>
       <PageHead id="sp-title" title="Siap Pasang: saya bina untuk anda." titleMark="Siap Pasang:">
+        {siap && <p className="sp-price">{siap.priceLabel}</p>}
         <p className="t-3">
-          Sistem autopost Threads lengkap, dibina dalam akaun anda sendiri. {price}.
+          Saya bina sistem lengkap dalam akaun anda. Harga asas untuk 1 akaun Threads. Akaun tambahan, post
+          bergambar atau penulisan kandungan disebut harga selepas sesi 15 minit.
         </p>
       </PageHead>
+
+      {siap && (
+        <section className="scope" aria-label="Skop dan harga Siap Pasang">
+          <div className="frame scope-grid">
+            <div className="scope-col">
+              <h2 className="t-3">Termasuk dalam harga asas</h2>
+              <ul className="ticks">
+                {siap.baseScope.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="scope-col">
+              <h2 className="t-3">Disebut harga berasingan</h2>
+              <ul className="ticks ticks-quoted">
+                {siap.quotedSeparately.map((line) => (
+                  <li key={line}>{line}</li>
+                ))}
+              </ul>
+              <p className="scope-care">{siap.carePlan}</p>
+            </div>
+            <div className="scope-how">
+              <h2 className="t-3">Cara ia berjalan</h2>
+              <ol className="how-steps">
+                <li>Hantar pertanyaan</li>
+                <li>Sesi 15 minit untuk faham keperluan anda</li>
+                <li>Sebut harga bertulis</li>
+                <li>Kerja bermula selepas sebut harga dipersetujui</li>
+              </ol>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="build" aria-labelledby="bina-title">
         <div className="frame build-grid">
@@ -50,7 +83,6 @@ export function SiapPasangPage() {
               <li>Kita setuju skop, harga akhir dan jadual secara bertulis sebelum kerja bermula.</li>
               <li>Saya bina sistem dalam akaun anda. Semua akaun kekal milik anda.</li>
             </ul>
-            <p className="enquiry-note">{product.packagesNote}</p>
             <p className="enquiry-note">
               Mahu buat sendiri? Lihat pakej <a href="/produk/autopost-threads#pakej">Starter dan Masterclass</a>.
             </p>

@@ -37,7 +37,7 @@ All copy below is a draft in Malay for the website. Anything in **\[square brack
 **Kad produk**
 
 - **Autopost Threads dengan AI.** Post ke Threads setiap hari ikut jadual anda, tanpa upah sesiapa. Dari RM89. Butang: *Lihat pakej*
-- **Siap Pasang.** Saya bina sistem lengkap dalam akaun anda. RM1,500. Butang: *Hantar pertanyaan*
+- **Siap Pasang.** Saya bina sistem lengkap dalam akaun anda. Dari RM1,500. Butang: *Hantar pertanyaan*
 
 ## Halaman produk ( /produk/autopost-threads )
 
@@ -78,7 +78,7 @@ Kapsyen: Ini sistem sebenar yang post ke akaun saya setiap hari.
 
 |  | Starter | Masterclass | Siap Pasang |
 | --- | --- | --- | --- |
-| Harga | RM89 | RM259 | RM1,500 |
+| Harga | RM89 | RM259 | Dari RM1,500 |
 | Untuk | Suka belajar ikut masa sendiri | Mahu setup bersama, dengan bimbingan | Mahu siap tanpa buat sendiri |
 | Manual PDF langkah demi langkah | ✓ | ✓ | — |
 | Video tutorial penuh | ✓ | ✓ | — |

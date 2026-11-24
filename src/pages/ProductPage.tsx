@@ -198,7 +198,7 @@ function PackageTile({
   index: number;
   onChoose: (id: string) => void;
 }) {
-  const price = pkg.kind === 'checkout' ? formatRM(pkg.priceSen) : formatRM(pkg.displayPriceSen);
+  const price = pkg.kind === 'checkout' ? formatRM(pkg.priceSen) : pkg.priceLabel;
   return (
     <article className={`tile tile-${index + 1}`} aria-labelledby={`tile-${pkg.id}`}>
       <div className="tile-body">

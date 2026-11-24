@@ -13,6 +13,7 @@ const legal = [
   { href: '/terma', label: 'Terma & Syarat' },
   { href: '/privasi', label: 'Notis Privasi' },
   { href: '/bayaran-balik', label: 'Polisi Bayaran Balik' },
+  { href: '/penghantaran', label: 'Polisi Penghantaran' },
   { href: '/hubungi', label: 'Hubungi Kami' },
 ];
 

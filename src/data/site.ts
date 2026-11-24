@@ -3,7 +3,7 @@
  * (owner, 2026-11-23); update it whenever the legal text changes, and again
  * on the day live CHIP keys go on (Phase 6).
  */
-export const LEGAL_LAST_UPDATED: string | null = '23 November 2026';
+export const LEGAL_LAST_UPDATED: string | null = '24 November 2026';
 
 /** Business facts shown on every page. Values in [brackets] still need the owner's answer. */
 export const site = {

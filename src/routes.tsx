@@ -6,7 +6,7 @@ import { HomePage } from './pages/HomePage';
 import { ProductPage } from './pages/ProductPage';
 import { LegalPage } from './pages/LegalPage';
 import { ContactPage, NotFoundPage, SiapPasangPage, ThankYouPage } from './pages/SimplePages';
-import { bayaranBalik, privasi, terma } from './content/legal';
+import { bayaranBalik, penghantaran, privasi, terma } from './content/legal';
 
 export interface RouteDef {
   meta: PageMeta;
@@ -80,6 +80,15 @@ export const routes: RouteDef[] = [
       type: 'article',
     },
     render: () => <LegalPage doc={bayaranBalik} />,
+  },
+  {
+    meta: {
+      path: '/penghantaran',
+      title: 'Polisi Penghantaran | GrowthBridge',
+      description: 'Penghantaran produk digital melalui emel: tempoh, apa perlu dibuat jika tidak sampai, dan pemulangan.',
+      type: 'article',
+    },
+    render: () => <LegalPage doc={penghantaran} />,
   },
   {
     meta: {

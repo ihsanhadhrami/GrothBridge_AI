@@ -63,7 +63,8 @@ export const terma: LegalDoc = {
       body: (
         <p>
           Akses kepada produk digital dihantar ke emel yang anda berikan selepas bayaran berjaya. Pastikan
-          emel anda betul. Akses diberi kepada emel tersebut sahaja.
+          emel anda betul. Akses diberi kepada emel tersebut sahaja. Butiran penuh dalam{' '}
+          <a href="/penghantaran">Polisi Penghantaran</a>.
         </p>
       ),
     },
@@ -339,6 +340,81 @@ export const bayaranBalik: LegalDoc = {
           dalam 7 hari dari tarikh pembelian. Untuk proses troubleshooting atau refund, mohon dalam tempoh sokongan 14
           hari dari tarikh pembelian. Bayaran balik yang diluluskan dihantar melalui kaedah bayaran asal dalam 14 hari bekerja.
           Akses kepada bahan dan group sokongan akan ditarik balik.
+        </p>
+      ),
+    },
+  ],
+};
+
+export const penghantaran: LegalDoc = {
+  title: 'Polisi Penghantaran',
+  lead: 'Cara produk dan perkhidmatan kami sampai kepada anda, berapa lama, dan apa perlu dibuat jika tidak sampai.',
+  sections: [
+    {
+      id: 'produk-digital',
+      title: 'Produk digital sahaja',
+      body: (
+        <p>
+          Kami menjual produk digital (manual, video, runbook), kelas online dan perkhidmatan setup. Tiada barang
+          fizikal dihantar melalui pos atau kurier, jadi tiada kos penghantaran.
+        </p>
+      ),
+    },
+    {
+      id: 'cara-penghantaran',
+      title: 'Cara penghantaran',
+      body: (
+        <p>
+          Selepas bayaran berjaya, emel dengan akses manual, video, jemputan group Telegram dan invois dihantar
+          secara automatik ke emel yang anda berikan semasa membeli. Pastikan emel anda betul. Akses diberi kepada
+          emel tersebut sahaja.
+        </p>
+      ),
+    },
+    {
+      id: 'tempoh',
+      title: 'Tempoh penghantaran',
+      body: (
+        <p>
+          Emel biasanya sampai dalam beberapa minit. Jika tiada dalam 30 minit, semak folder spam, kemudian emel{' '}
+          <Email /> dengan nombor pesanan anda.
+        </p>
+      ),
+    },
+    {
+      id: 'tidak-sampai',
+      title: 'Jika akses tidak sampai',
+      body: (
+        <p>
+          Jika akses tidak sampai kepada anda dan kami tidak dapat menyelesaikannya dalam 3 hari bekerja selepas
+          anda menghubungi kami, anda layak mendapat bayaran balik penuh. Lihat{' '}
+          <a href="/bayaran-balik">Polisi Bayaran Balik</a>.
+        </p>
+      ),
+    },
+    {
+      id: 'masterclass',
+      title: 'Masterclass',
+      body: (
+        <p>
+          Selepas bayar, anda terima pautan untuk tempah slot. Sesi 2 jam secara online perlu ditempah dan
+          dihadiri dalam tempoh 60 hari dari tarikh pembelian. Anda boleh tukar slot sekali dengan notis
+          sekurang-kurangnya 48 jam. Runbook Claude diberi selepas sesi selesai.
+        </p>
+      ),
+    },
+    {
+      id: 'siap-pasang',
+      title: 'Siap Pasang',
+      body: <p>Skop, harga akhir dan jadual dipersetujui secara bertulis sebelum kerja bermula.</p>,
+    },
+    {
+      id: 'pemulangan',
+      title: 'Pemulangan',
+      body: (
+        <p>
+          Produk digital tidak boleh dipulangkan seperti barang fizikal. Permohonan bayaran balik tertakluk
+          kepada <a href="/bayaran-balik">Polisi Bayaran Balik</a>.
         </p>
       ),
     },

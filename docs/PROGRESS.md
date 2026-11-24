@@ -1,16 +1,27 @@
 # Progress and handoff
 
-Last updated: 2026-11-22.
+Last updated: 2026-11-24.
 
 ## Status
 
 - **Phase 0: done.**
-- **Phase 1 (site, pages, prerendering): built and checked; review changes applied (2026-11-22, see below). Waiting for the owner's approval.** Phase 2 doesn't start until the owner approves.
+- **Phase 1 (site, pages, prerendering): done. Approved by the owner on 2026-11-24.**
+  - Live on https://growthbridge.my in pre-launch mode for CHIP merchant review (`PAYMENTS_ENABLED = false`).
+  - Pages: 5 policy pages, including Polisi Penghantaran.
+- **Phase 4 (deploy): mostly done early, for the CHIP review.**
+  - Done: custom domains growthbridge.my and www (301 to the apex), and security headers set in `worker/index.ts`.
+  - Still to do: `wrangler secret put` for the CHIP/Notion/Make/Telegram secrets, and CHIP's checkout domain in the CSP. Both wait on Phase 2/3.
+- **Next: Phase 2 (checkout API, CHIP test mode), in a new chat.** Start by reading CLAUDE.md, this file and docs/PLAN.md Phase 2. Notes:
+  - The Worker now runs first for every request (`run_worker_first: true`): it 301s www, serves `/api/*` (currently a 501 stub), and passes everything else to the static assets. Build the API inside that same `fetch`.
+  - Keep one Worker only; the owner's rule.
+  - Turn `PAYMENTS_ENABLED` on only once checkout works in test mode; the checkout form in `src/components/CheckoutForm.tsx` is already wired to `POST /api/checkout`.
+  - Put the buyer's name, email and phone, reference = order ID, and the product and package on the CHIP purchase (see "Decisions" below). Build the CHIP redirect and callback URLs from `site.url`.
+  - The SSM address is deliberately not on the site (owner's choice, 2026-11-24), even though CHIP asked for it.
 
 ## Phase 1: what was built
 
-- Vite 8 + React 19 + `@cloudflare/vite-plugin`, with a Worker stub in `worker/index.ts`. It answers `/api/*` with 501 and a Malay message until Phase 2.
-- `wrangler.jsonc`: `run_worker_first: ["/api/*"]`, `html_handling: auto-trailing-slash`, 404 page.
+- Vite 8 + React 19 + `@cloudflare/vite-plugin`, with a Worker stub in `worker/index.ts`. It answers `/api/*` with 501 and a Malay message until Phase 2. (Since 2026-11-23 it also runs first for every request; see Status.)
+- `wrangler.jsonc`: `html_handling: auto-trailing-slash`, 404 page. (`run_worker_first` was `["/api/*"]` in Phase 1; since 2026-11-23 it is `true`.)
 - `src/data/products.ts`: the single source of products and prices (in sen), page copy, FAQ, step stills and the demo video. Siap Pasang is `kind: 'enquiry'` with `displayPriceSen` only, so it can never be charged.
 - `src/lib/validate.ts`: shared form validation for the browser and, from Phase 2, the Worker. `src/lib/money.ts`: `formatRM`.
 - Prerendering: `vite.prerender.config.ts` builds `src/entry-server.tsx`. `scripts/prerender.mjs` renders every route with `renderToString` into `dist/client/<route>.html`, plus `404.html`, `sitemap.xml` and `robots.txt`. It also lists any `[placeholder]` left in the copy. The client hydrates with `hydrateRoot`.

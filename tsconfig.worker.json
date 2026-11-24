@@ -13,5 +13,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["worker", "src/data", "src/lib"]
+  "include": ["worker", "src/data", "src/lib", "tests"]
 }

@@ -1,6 +1,6 @@
 # Progress and handoff
 
-Last updated: 2026-11-24.
+Last updated: 2026-11-25.
 
 ## Status
 
@@ -11,12 +11,57 @@ Last updated: 2026-11-24.
 - **Phase 4 (deploy): mostly done early, for the CHIP review.**
   - Done: custom domains growthbridge.my and www (301 to the apex), and security headers set in `worker/index.ts`.
   - Still to do: `wrangler secret put` for the CHIP/Notion/Make/Telegram secrets, and CHIP's checkout domain in the CSP. Both wait on Phase 2/3.
-- **Next: Phase 2 (checkout API, CHIP test mode), in a new chat.** Start by reading CLAUDE.md, this file and docs/PLAN.md Phase 2. Notes:
+- **Phase 2 (checkout API): built and unit-tested on 2026-11-25. Waiting for the owner's review and a real CHIP test-mode run.** See "Phase 2: what was built" below. Not committed or deployed yet.
+- (Original Phase 2 handoff notes, kept for reference:)
   - The Worker now runs first for every request (`run_worker_first: true`): it 301s www, serves `/api/*` (currently a 501 stub), and passes everything else to the static assets. Build the API inside that same `fetch`.
   - Keep one Worker only; the owner's rule.
   - Turn `PAYMENTS_ENABLED` on only once checkout works in test mode; the checkout form in `src/components/CheckoutForm.tsx` is already wired to `POST /api/checkout`.
   - Put the buyer's name, email and phone, reference = order ID, and the product and package on the CHIP purchase (see "Decisions" below). Build the CHIP redirect and callback URLs from `site.url`.
   - The SSM address is deliberately not on the site (owner's choice, 2026-11-24), even though CHIP asked for it.
+
+## Phase 2: what was built (2026-11-25)
+
+- `POST /api/checkout` in `worker/checkout.ts`, routed from `worker/index.ts`:
+  1. Rate limit: 10 per minute per IP (`CHECKOUT_RATE_LIMIT` binding in `wrangler.jsonc`). Answers 429 with a Malay message.
+  2. Validation: `src/lib/validate.ts` (same rules as the browser). The price comes from `getCheckoutPackage()` in `src/data/products.ts`. Any price in the body is ignored, and Siap Pasang is refused.
+  3. Order ID `GB-<YYYYMMDDHHMMSS Malaysia time>-<4 chars>` (`worker/order-id.ts`).
+  4. CHIP purchase (`worker/chip.ts`):
+     - Buyer: `full_name`, `email` (lower-cased) and `phone` ("+60 123456789").
+     - `reference` = order ID. `purchase.metadata` = {order_id, product, package}; the line's `category` = "product/package".
+     - Redirects: success → `/terima-kasih`; failure and cancel → `/produk/<slug>?pakej=<id>#beli`. Callback → `/api/webhooks/chip`. All URLs are built from `site.url`. `send_receipt: false`.
+     - The answer is checked: `checkout_url` must be on gate.chip-in.asia, and CHIP's total must equal our price.
+  5. Notion Pending row (`worker/notion.ts`, API version 2022-06-28, `parent.database_id`). It sets every Orders property the Worker owns, and Notes = "CHIP test mode" when `is_test`.
+     - It runs in `ctx.waitUntil` after the answer, so the buyer never waits on Notion.
+     - If it fails, Telegram gets every detail needed to add the row by hand.
+  6. The answer is `{ checkout_url }`. A plain form post (no JavaScript) gets a 303 to CHIP, or a small Malay error page.
+- Errors:
+  - Every outside call goes through `fetchWithTimeout` (`worker/upstream.ts`): CHIP 10 s, Notion 6 s, Telegram 5 s.
+  - CHIP failure → 502 plus a Malay message for the buyer, and a Telegram alert.
+  - CHIP keys missing → 503 "Pembayaran belum dibuka" plus an alert. The live site is in this state today: no secrets set.
+  - Telegram failing or not configured → the alert goes to the Worker log (`console.error`, observability on).
+  - Any unexpected exception in `/api/*` → 500 plus an alert.
+- Routing:
+  - GET `/api/checkout` → 405.
+  - `/api/enquiry` and `/api/webhooks/chip` → 501 until Phase 3.
+  - Any other `/api/*` → 404.
+- CSP: `form-action` now allows `https://gate.chip-in.asia`, because browsers apply form-action to the 303 after a form post. `connect-src` stays `'self'`.
+- Secrets: typed in `worker/env.ts` (optional, checked per handler). Names are listed in `.dev.vars.example` (tracked, no values).
+- Tests: `npm test` (vitest; `vitest.config.ts`, `tests/`). 49 tests:
+  - validation and phone formats
+  - price lookup and the products file
+  - order IDs
+  - the handler end to end with a fake fetch: success, a price sent by the browser, a form post, field errors, enquiry and unknown packages, rate limit, bad bodies, missing keys, CHIP error, timeout, wrong host and wrong total, Notion down or unset, Telegram down
+  - routing, and the www redirect
+- Checked in `vite preview` (the Workers runtime) without secrets:
+  - a valid checkout → 503 with the Malay message, and the alert is logged
+  - field errors → 400 with Malay messages
+  - Siap Pasang → 400
+  - the no-JS error page renders
+  - GET → 405; `/api/enquiry` → 501
+  - the 11th request in a minute → 429
+  - the pages still return 200
+- **Still to do for Phase 2 sign-off:** one real CHIP test-mode purchase. The owner fills `.dev.vars` from `.dev.vars.example` with the CHIP **test** key. Then run `npm run build`, restart `vite preview`, and `POST /api/checkout`. Expect: a `checkout_url`, a Notion row with Pending + "CHIP test mode", and, after paying with test card 4444 3333 2222 1111 / CVC 123, a landing on `/terima-kasih`.
+- `PAYMENTS_ENABLED` is still false. Flipping it also switches the Siap Pasang form to `POST /api/enquiry`, which is Phase 3. So either flip it after Phase 3, or split the flag first (the owner decides).
 
 ## Phase 1: what was built
 
@@ -164,6 +209,7 @@ Last updated: 2026-11-24.
 ```bash
 npm install
 npm run build                   # tsc, client + Worker build, SSR build, prerender
+npm test                        # unit tests (vitest)
 npx vite preview --port 4173    # serves dist/ in the Worker runtime
 ```
 

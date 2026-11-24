@@ -13,6 +13,17 @@ export function normalisePhone(raw: string): string {
   return raw.replace(/[\s\-().]/g, '');
 }
 
+/**
+ * A phone number that passed validatePhone, in two forms:
+ * e164 "+60123456789" (Notion) and chip "+60 123456789" (CHIP's
+ * "<country_code> <number>" format).
+ */
+export function intlPhone(raw: string): { e164: string; chip: string } {
+  const s = normalisePhone(raw);
+  const national = s.startsWith('+60') ? s.slice(3) : s.startsWith('60') ? s.slice(2) : s.replace(/^0/, '');
+  return { e164: `+60${national}`, chip: `+60 ${national}` };
+}
+
 export function validateName(v: string): string | undefined {
   const s = v.trim();
   if (s.length < 2) return 'Sila isi nama penuh anda.';

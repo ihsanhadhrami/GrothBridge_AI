@@ -11,5 +11,5 @@
     "skipLibCheck": true,
     "noEmit": true
   },
-  "include": ["vite.config.ts", "vite.prerender.config.ts"]
+  "include": ["vite.config.ts", "vite.prerender.config.ts", "vitest.config.ts"]
 }

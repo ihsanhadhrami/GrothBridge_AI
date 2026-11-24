@@ -1,0 +1,17 @@
+# Copy to .dev.vars (gitignored) and fill in locally. Never commit real values,
+# never paste them into chat. Production uses `npx wrangler secret put <NAME>`.
+# Phase 2 (checkout) needs the first six. Use CHIP's TEST secret key here.
+
+CHIP_SECRET_KEY=
+CHIP_BRAND_ID=
+NOTION_TOKEN=
+# The Orders database ID: the 32 characters in its Notion URL.
+NOTION_ORDERS_DB=
+TELEGRAM_BOT_TOKEN=
+TELEGRAM_ADMIN_CHAT_ID=
+
+# Phase 3
+CHIP_PUBLIC_KEY=
+NOTION_ENQUIRIES_DB=
+MAKE_WEBHOOK_URL=
+MAKE_SHARED_SECRET=

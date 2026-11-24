@@ -1110,6 +1110,14 @@ main:focus {
   display: grid;
   gap: 6px;
 }
+/* Small action beside a section headline (Framer pattern). */
+.section-action {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  color: var(--muted);
+}
 .faq-item {
   background: var(--surface-1);
   transition: background-color 0.2s ease;
@@ -1182,13 +1190,14 @@ main:focus {
     column-gap: var(--gap);
   }
   .faq-head {
-    grid-column: 1 / 5;
-    position: sticky;
-    top: 24px;
-    align-self: start;
+    grid-column: 1 / 13;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--gap);
   }
   .faq-list {
-    grid-column: 6 / 13;
+    grid-column: 1 / 13;
   }
 }
 
@@ -1446,8 +1455,7 @@ main:focus {
   object-fit: cover;
   object-position: top;
 }
-.about-pictures figcaption,
-.build-item figcaption {
+.about-pictures figcaption {
   margin-top: 12px;
   color: var(--muted);
 }
@@ -1504,9 +1512,11 @@ main:focus {
 .build {
   padding-block: var(--section) 0;
 }
-.build-grid {
+/* Card grid of the real interface: the video card, then one card per screenshot. */
+.bento {
   display: grid;
-  gap: 40px;
+  gap: var(--gap);
+  margin-top: 32px;
 }
 .build-video {
   background: var(--green);
@@ -1518,28 +1528,67 @@ main:focus {
 .build-video :focus-visible {
   outline-color: var(--navy);
 }
-.build-list {
-  display: grid;
-  gap: 32px;
-  align-content: start;
+.bento-shot {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
 }
-.build-item img {
+.bento-media {
+  padding: clamp(14px, 1.6vw, 20px) clamp(14px, 1.6vw, 20px) 0;
+}
+.bento-media img {
+  display: block;
   width: 100%;
   height: auto;
 }
+/* Portrait phone screenshots: show the top, where the content is. */
+.bento-simpan .bento-media img,
+.bento-post .bento-media img {
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  object-position: top;
+}
+.bento-shot figcaption {
+  display: grid;
+  gap: 6px;
+  padding: 18px clamp(16px, 1.8vw, 24px) clamp(18px, 2vw, 26px);
+}
+.bento-shot figcaption strong {
+  font-size: var(--t-3);
+  letter-spacing: -0.012em;
+}
+.bento-shot figcaption span {
+  color: var(--muted);
+}
+@media (min-width: 720px) and (max-width: 959px) {
+  .bento {
+    grid-template-columns: 1fr 1fr;
+  }
+  .bento-video,
+  .bento-jadual {
+    grid-column: 1 / 3;
+  }
+}
 @media (min-width: 960px) {
-  .build-grid {
+  .bento {
     grid-template-columns: repeat(12, 1fr);
-    column-gap: var(--gap);
+    grid-template-rows: auto auto;
   }
-  .build-video {
+  .bento-video {
     grid-column: 1 / 6;
-    align-self: start;
-    position: sticky;
-    top: 24px;
+    grid-row: 1 / 3;
   }
-  .build-list {
-    grid-column: 7 / 13;
+  .bento-simpan {
+    grid-column: 6 / 9;
+    grid-row: 1;
+  }
+  .bento-post {
+    grid-column: 9 / 13;
+    grid-row: 1;
+  }
+  .bento-jadual {
+    grid-column: 6 / 13;
+    grid-row: 2;
   }
 }
 
@@ -1890,4 +1939,115 @@ main:focus {
     opacity: 1;
     transform: none;
   }
+}
+
+/* ---------- Shapes (owner, 2026-11-25: Framer-style) ----------
+   Pills for every button and label, rounded cards with a thin line, and
+   plain text links wrapped in a soft pill. The logo's bars stay square on
+   purpose: the hero, page-head and footer bars, the schedule chart slots,
+   and the bar-shaped list bullets are the brand mark, not wording. */
+:root {
+  --r-pill: 999px;
+  --r-card: 16px;
+  --r-inner: 12px;
+  --card-line: rgba(255, 255, 255, 0.08);
+}
+
+/* Buttons and labels: pills. */
+.btn,
+.skip-link,
+.teaser-toggle,
+.day-toggle,
+.choice-pill span,
+.tile-action,
+.tile-closed-note,
+.buy-closed-note,
+.week-label {
+  border-radius: var(--r-pill);
+}
+.week-label {
+  padding-inline: 6px;
+}
+.tile-closed-note,
+.buy-closed-note {
+  justify-content: center;
+  text-align: center;
+}
+/* Package tiles: the action sits as a pill inside the card instead of a full-width band. */
+.tile-action {
+  justify-content: center;
+  min-height: 52px;
+  margin: 0 20px 20px;
+}
+.tile-closed {
+  gap: 8px;
+  margin: 0 20px 20px;
+}
+.tile-closed .tile-action {
+  margin: 0;
+}
+.tile-closed-note {
+  min-height: 52px;
+}
+/* Masterclass tile is already surface-2: lift its note one step so the pill shows. */
+.tile-2 .tile-closed-note {
+  background: var(--surface-3);
+}
+.how-steps li::before {
+  border-radius: 50%;
+}
+.hl {
+  border-radius: 0.14em;
+}
+
+/* Cards and boxes: rounded, with a thin line. */
+.p-hero-card,
+.p-hero-stage,
+.step-tile,
+.tile,
+.faq-item,
+.h-product,
+.order-summary,
+.enquiry-panel,
+.company-card,
+.legal-toc,
+.bento-card {
+  border-radius: var(--r-card);
+  border: 1px solid var(--card-line);
+}
+.h-product,
+.p-hero-card,
+.bento-card {
+  overflow: hidden;
+}
+.package-option,
+.field input,
+.field textarea {
+  border-radius: var(--r-inner);
+}
+.teaser-video,
+.step-tile img,
+.about-pictures img,
+.h-product-img,
+.bento-media img {
+  border-radius: var(--r-inner);
+}
+
+/* Plain text links in page content: a soft pill. Nav lists (header, footer,
+   legal contents) stay plain, as on framer.com. */
+main :is(p, li, dd, figcaption, label) > a:not([class]):not(nav a) {
+  padding: 0.1em 0.6em;
+  border-radius: var(--r-pill);
+  background: rgba(16, 201, 135, 0.14);
+  color: var(--ink);
+  text-decoration: none;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+main :is(p, li, dd, figcaption, label) > a:not([class]):not(nav a):hover {
+  background: var(--green);
+  color: var(--on-green);
 }

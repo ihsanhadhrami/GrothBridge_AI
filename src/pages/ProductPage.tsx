@@ -145,8 +145,11 @@ export function ProductPage({ product }: { product: Product }) {
             <h2 id="faq-title" className="t-2">
               {product.faqTitle}
             </h2>
-            <p>
-              Soalan lain? <a href="/hubungi">Hubungi kami</a>.
+            <p className="section-action">
+              <span>Soalan lain?</span>
+              <a className="btn btn-secondary btn-small" href="/hubungi">
+                Hubungi kami
+              </a>
             </p>
           </div>
           <div className="faq-list">

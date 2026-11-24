@@ -52,19 +52,23 @@ export function SiapPasangPage() {
       )}
 
       <section className="build" aria-labelledby="bina-title">
-        <div className="frame build-grid">
-          <div className="build-video">
-            <TeaserVideo src={product.demo.videoSrc} poster={product.demo.posterSrc} label={product.demo.label} />
-          </div>
-          <div className="build-list">
-            <h2 id="bina-title" className="t-2">
-              Apa yang saya bina
-            </h2>
+        <div className="frame">
+          <h2 id="bina-title" className="t-2">
+            Apa yang saya bina
+          </h2>
+          {/* Card grid of the real interface (Framer-style): video card plus one card per screenshot. */}
+          <div className="bento">
+            <div className="bento-card build-video bento-video">
+              <TeaserVideo src={product.demo.videoSrc} poster={product.demo.posterSrc} label={product.demo.label} />
+            </div>
             {stills.map((s) => (
-              <figure key={s.name} className="build-item" data-reveal>
-                <img src={s.image!.src} alt={s.image!.alt} width={s.image!.width} height={s.image!.height} loading="lazy" decoding="async" />
+              <figure key={s.name} className={`bento-card bento-shot bento-${s.name.toLowerCase()}`} data-reveal>
+                <div className="bento-media">
+                  <img src={s.image!.src} alt={s.image!.alt} width={s.image!.width} height={s.image!.height} loading="lazy" decoding="async" />
+                </div>
                 <figcaption>
-                  <strong>{s.name}.</strong> {s.text}
+                  <strong>{s.name}</strong>
+                  <span>{s.text}</span>
                 </figcaption>
               </figure>
             ))}

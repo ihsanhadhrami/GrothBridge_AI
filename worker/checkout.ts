@@ -6,6 +6,7 @@ import { buildPurchase, createPurchase, type CreatedPurchase } from './chip';
 import type { Ctx, WorkerEnv } from './env';
 import { createOrderRow, type PendingOrder } from './notion';
 import { newOrderId } from './order-id';
+import { BODY_MESSAGES, checked, errorText, htmlPage, json, readBody, str } from './http';
 import { sendAlert } from './telegram';
 
 /**
@@ -31,8 +32,7 @@ export const MESSAGES = {
   invalid: 'Sila semak maklumat yang ditanda.',
   unknownPackage: 'Pakej ini tidak dijumpai. Muat semula halaman dan cuba lagi.',
   rateLimited: 'Terlalu banyak cubaan. Tunggu seminit, kemudian cuba lagi.',
-  badRequest: 'Permintaan tidak dapat dibaca. Muat semula halaman dan cuba lagi.',
-  tooLarge: 'Permintaan terlalu besar.',
+  ...BODY_MESSAGES,
   notOpen: `Pembayaran belum dibuka. Sila emel ${site.email} untuk membeli.`,
   chipFailed: `Maaf, halaman bayaran tidak dapat dibuka sekarang. Cuba lagi sebentar, atau emel ${site.email}.`,
 } as const;
@@ -46,7 +46,7 @@ export async function handleCheckout(request: Request, env: WorkerEnv, ctx: Ctx)
   const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
   const { success } = await env.CHECKOUT_RATE_LIMIT.limit({ key: `checkout:${ip}` });
 
-  const parsed = await readBody(request);
+  const parsed = await readBody(request, MAX_BODY_BYTES);
   const asForm = parsed.form;
   if (!success) return reply(asForm, 429, { error: MESSAGES.rateLimited });
   if ('status' in parsed) return reply(asForm, parsed.status, { error: parsed.error });
@@ -122,67 +122,21 @@ async function writeOrderRow(env: WorkerEnv, order: PendingOrder, summary: strin
   }
 }
 
-type ParsedBody = { form: boolean; fields: Record<string, unknown> } | { form: boolean; status: number; error: string };
-
-async function readBody(request: Request): Promise<ParsedBody> {
-  const type = (request.headers.get('content-type') ?? '').split(';')[0]!.trim().toLowerCase();
-  const form = type === 'application/x-www-form-urlencoded';
-  if (type !== 'application/json' && !form) return { form, status: 415, error: MESSAGES.badRequest };
-
-  const declared = Number(request.headers.get('content-length') ?? '0');
-  if (declared > MAX_BODY_BYTES) return { form, status: 413, error: MESSAGES.tooLarge };
-  const text = await request.text().catch(() => null);
-  if (text === null) return { form, status: 400, error: MESSAGES.badRequest };
-  if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) return { form, status: 413, error: MESSAGES.tooLarge };
-
-  if (form) return { form, fields: Object.fromEntries(new URLSearchParams(text)) };
-  try {
-    const data: unknown = JSON.parse(text);
-    if (data && typeof data === 'object' && !Array.isArray(data)) return { form, fields: data as Record<string, unknown> };
-  } catch {
-    // fall through
-  }
-  return { form, status: 400, error: MESSAGES.badRequest };
-}
-
 /** Only the fields we know, as strings. A checkbox posts "on". */
 export function toCheckoutInput(fields: Record<string, unknown>): CheckoutInput {
-  const str = (v: unknown) => (typeof v === 'string' ? v : '');
   return {
     product: str(fields.product),
     package: str(fields.package),
     name: str(fields.name),
     email: str(fields.email),
     phone: str(fields.phone),
-    consent: fields.consent === true || fields.consent === 'on' || fields.consent === 'true',
+    consent: checked(fields.consent),
   };
-}
-
-function errorText(err: unknown): string {
-  return err instanceof Error ? err.message : String(err);
-}
-
-export function json(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' },
-  });
 }
 
 /** JSON for the site's fetch; a small Malay page for a plain form post. */
 function reply(asForm: boolean, status: number, body: ErrorBody, back = '/'): Response {
   if (!asForm) return json(body, status);
-  const items = Object.values(body.errors ?? {})
-    .map((e) => `<li>${escapeHtml(e ?? '')}</li>`)
-    .join('');
-  const html =
-    `<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">` +
-    `<meta name="robots" content="noindex"><title>Pembayaran belum dimulakan | GrowthBridge</title></head><body>` +
-    `<h1>Pembayaran belum dimulakan</h1><p>${escapeHtml(body.error)}</p>${items ? `<ul>${items}</ul>` : ''}` +
-    `<p><a href="${escapeHtml(back)}">Kembali ke borang</a></p></body></html>`;
-  return new Response(html, { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
-}
-
-function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
+  const items = Object.values(body.errors ?? {}).filter((e): e is string => typeof e === 'string');
+  return htmlPage(status, 'Pembayaran belum dimulakan', body.error, items, back, 'Kembali ke borang');
 }

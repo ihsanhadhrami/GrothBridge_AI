@@ -36,6 +36,8 @@ function makeEnv(overrides: Partial<WorkerEnv> = {}, allow = true): WorkerEnv {
   return {
     ASSETS: { fetch: async () => new Response('asset') } as unknown as Fetcher,
     CHECKOUT_RATE_LIMIT: { limit: vi.fn(async () => ({ success: allow })) },
+    ENQUIRY_RATE_LIMIT: { limit: vi.fn(async () => ({ success: true })) },
+    ALERT_RATE_LIMIT: { limit: vi.fn(async () => ({ success: true })) },
     CHIP_SECRET_KEY: 'test-secret',
     CHIP_BRAND_ID: 'brand-123',
     NOTION_TOKEN: 'notion-token',
@@ -288,12 +290,15 @@ describe('Worker routing', () => {
     expect(res.headers.get('x-frame-options')).toBe('DENY');
   });
 
-  it('405 for GET /api/checkout, 501 for Phase 3 endpoints, 404 for unknown', async () => {
-    const get = await run(new Request('https://growthbridge.my/api/checkout'));
-    expect(get.status).toBe(405);
-    expect(get.headers.get('allow')).toBe('POST');
-    expect((await run(new Request('https://growthbridge.my/api/enquiry', { method: 'POST' }))).status).toBe(501);
-    expect((await run(new Request('https://growthbridge.my/api/webhooks/chip', { method: 'POST' }))).status).toBe(501);
+  it('405 for GET on the API, the Phase 3 endpoints are routed, 404 for unknown', async () => {
+    for (const path of ['/api/checkout', '/api/enquiry', '/api/webhooks/chip']) {
+      const get = await run(new Request(`https://growthbridge.my${path}`));
+      expect(get.status).toBe(405);
+      expect(get.headers.get('allow')).toBe('POST');
+    }
+    // Reached the handlers: no content type → 415; no signature → 400.
+    expect((await run(new Request('https://growthbridge.my/api/enquiry', { method: 'POST' }))).status).toBe(415);
+    expect((await run(new Request('https://growthbridge.my/api/webhooks/chip', { method: 'POST', body: '{}' }))).status).toBe(400);
     expect((await run(new Request('https://growthbridge.my/api/nope'))).status).toBe(404);
   });
 

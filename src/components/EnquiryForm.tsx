@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { site } from '../data/site';
 import { products } from '../data/products';
-import { validateEnquiry, type FieldErrors } from '../lib/validate';
+import { enquiryDetailLines, MEDIA_OPTIONS, validateEnquiry, WRITING_OPTIONS, type FieldErrors } from '../lib/validate';
 import { Consent, Field, networkErrorMessage, postJson } from './Field';
 import { ENQUIRY_API_ENABLED } from '../config';
 import { enquiryMailto } from '../lib/mailto';
@@ -52,11 +52,7 @@ export function EnquiryForm() {
         `Nama: ${v.name.trim()}`,
         `Emel: ${v.email.trim()}`,
         `Telefon: ${v.phone.trim()}`,
-        `Bisnes: ${v.business.trim() || '-'}`,
-        `Threads: ${v.threads.trim() || '-'}`,
-        `Bilangan akaun Threads: ${v.accounts.trim() || '-'}`,
-        `Perlu post bergambar/video?: ${v.media || '-'}`,
-        `Perlu bantuan menulis kandungan?: ${v.writing || '-'}`,
+        ...enquiryDetailLines(input),
         '',
         'Apa yang saya mahu automasikan:',
         v.message.trim(),
@@ -149,8 +145,8 @@ export function EnquiryForm() {
         onChange={set('accounts')}
         error={errors.accounts}
       />
-      <Choice name="media" legend="Perlu post bergambar/video?" options={['Ya', 'Tidak', 'Belum pasti']} value={v.media} onChange={(x) => setV((o) => ({ ...o, media: x }))} />
-      <Choice name="writing" legend="Perlu bantuan menulis kandungan?" options={['Ya', 'Tidak']} value={v.writing} onChange={(x) => setV((o) => ({ ...o, writing: x }))} />
+      <Choice name="media" legend="Perlu post bergambar/video?" options={MEDIA_OPTIONS} value={v.media} onChange={(x) => setV((o) => ({ ...o, media: x }))} />
+      <Choice name="writing" legend="Perlu bantuan menulis kandungan?" options={WRITING_OPTIONS} value={v.writing} onChange={(x) => setV((o) => ({ ...o, writing: x }))} />
       <div className="field">
         <label htmlFor="message">Apa yang anda mahu automasikan?</label>
         <textarea
@@ -198,7 +194,7 @@ function Choice({
 }: {
   name: string;
   legend: string;
-  options: string[];
+  options: readonly string[];
   value: string;
   onChange: (value: string) => void;
 }) {

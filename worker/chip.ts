@@ -121,3 +121,79 @@ export async function createPurchase(secretKey: string, body: PurchaseBody): Pro
   }
   return { id: data.id, checkoutUrl: data.checkout_url, isTest: data.is_test === true };
 }
+
+/** The parts of a CHIP Purchase the webhook and the cron read. */
+export interface ChipPurchase {
+  id: string;
+  status: string;
+  is_test?: boolean;
+  brand_id?: string;
+  reference?: string;
+  created_on?: number;
+  client?: { email?: string; full_name?: string; phone?: string };
+  purchase?: {
+    currency?: string;
+    total?: number;
+    metadata?: Record<string, unknown> | null;
+    products?: { name?: string; price?: number; category?: string }[];
+  };
+  /** null while unpaid. paid_on is Unix seconds. */
+  payment?: { amount?: number; currency?: string; paid_on?: number | null } | null;
+}
+
+/** GET /purchases/{id}/. Throws UpstreamError (status 404 if CHIP doesn't know the id). */
+export async function getPurchase(secretKey: string, purchaseId: string): Promise<ChipPurchase> {
+  if (!/^[0-9a-f-]{36}$/i.test(purchaseId)) throw new UpstreamError('CHIP', `"${purchaseId}" is not a CHIP purchase id`);
+  const res = await fetchWithTimeout(
+    'CHIP',
+    `${CHIP_API}/purchases/${purchaseId}/`,
+    { headers: { authorization: `Bearer ${secretKey}`, accept: 'application/json' } },
+    TIMEOUT_MS,
+  );
+  if (!res.ok) {
+    throw new UpstreamError('CHIP', `get purchase ${purchaseId} answered ${res.status}: ${await bodySnippet(res, 200)}`, res.status);
+  }
+  const data = (await res.json().catch(() => null)) as ChipPurchase | null;
+  if (!data || data.id !== purchaseId || typeof data.status !== 'string') {
+    throw new UpstreamError('CHIP', `get purchase ${purchaseId} answered without the purchase`);
+  }
+  return data;
+}
+
+/**
+ * The company public key that verifies success_callback signatures
+ * (GET /public_key/, a JSON-encoded PEM string). Webhooks set up in the CHIP
+ * portal use their own key instead, which is CHIP_PUBLIC_KEY. Cached for the
+ * life of the isolate, per secret key.
+ */
+let companyKeyCache: { secretKey: string; pem: Promise<string> } | null = null;
+
+export function getCompanyPublicKey(secretKey: string): Promise<string> {
+  if (companyKeyCache?.secretKey === secretKey) return companyKeyCache.pem;
+  const pem = fetchCompanyPublicKey(secretKey);
+  companyKeyCache = { secretKey, pem };
+  pem.catch(() => {
+    if (companyKeyCache?.pem === pem) companyKeyCache = null; // retry next time
+  });
+  return pem;
+}
+
+async function fetchCompanyPublicKey(secretKey: string): Promise<string> {
+  const res = await fetchWithTimeout(
+    'CHIP',
+    `${CHIP_API}/public_key/`,
+    { headers: { authorization: `Bearer ${secretKey}`, accept: 'application/json' } },
+    TIMEOUT_MS,
+  );
+  if (!res.ok) throw new UpstreamError('CHIP', `get public key answered ${res.status}: ${await bodySnippet(res, 200)}`, res.status);
+  const pem = (await res.json().catch(() => null)) as unknown;
+  if (typeof pem !== 'string' || !pem.includes('BEGIN PUBLIC KEY')) {
+    throw new UpstreamError('CHIP', 'get public key answered without a PEM string');
+  }
+  return pem;
+}
+
+/** For tests: forget the cached company key. */
+export function resetCompanyKeyCache(): void {
+  companyKeyCache = null;
+}

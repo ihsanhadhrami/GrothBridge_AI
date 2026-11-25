@@ -12,6 +12,7 @@ export const PAYMENTS_ENABLED: boolean = false;
 /**
  * ENQUIRY_API_ENABLED: the Siap Pasang form. While false, the form opens the
  * visitor's email app with the details filled in, and the browser never calls
- * /api/enquiry. Turn on once POST /api/enquiry is built (Phase 3).
+ * /api/enquiry. POST /api/enquiry is built (Phase 3); turn this on once the
+ * Worker has NOTION_ENQUIRIES_DB, NOTION_TOKEN and the Telegram secrets.
  */
 export const ENQUIRY_API_ENABLED: boolean = false;

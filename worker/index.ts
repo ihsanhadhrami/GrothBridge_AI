@@ -1,16 +1,22 @@
 import { site } from '../src/data/site';
-import { handleCheckout, json } from './checkout';
+import { handleCheckout } from './checkout';
 import { CHIP_CHECKOUT_ORIGIN } from './chip';
+import { reconcile } from './cron';
+import { handleEnquiry } from './enquiry';
 import type { WorkerEnv } from './env';
+import { json } from './http';
 import { sendAlert } from './telegram';
+import { handleChipWebhook } from './webhook';
 
 /**
  * Worker entry. It runs first for every request (run_worker_first: true in
  * wrangler.jsonc) because one Worker serves both custom domains:
  *   - www.growthbridge.my → 301 to the apex, same path and query.
- *   - POST /api/checkout  → worker/checkout.ts (CHIP purchase + Notion row).
- *   - /api/enquiry, /api/webhooks/chip → Phase 3; 501 until then.
- *   - everything else     → the prerendered static files (env.ASSETS).
+ *   - POST /api/checkout       → worker/checkout.ts (CHIP purchase + Notion row).
+ *   - POST /api/webhooks/chip  → worker/webhook.ts (verified payment → Make).
+ *   - POST /api/enquiry        → worker/enquiry.ts (Notion + Telegram).
+ *   - everything else          → the prerendered static files (env.ASSETS).
+ * Plus `scheduled`, every 15 minutes: worker/cron.ts (missed payments, expiry).
  * Every response leaves with the security headers below, so they are set in
  * one place. http → https is the zone's "Always Use HTTPS" setting.
  */
@@ -41,19 +47,21 @@ function secure(response: Response): Response {
   return out;
 }
 
-const NOT_BUILT = new Set(['/api/enquiry', '/api/webhooks/chip']);
+const ROUTES: Record<string, (request: Request, env: WorkerEnv, ctx: ExecutionContext) => Promise<Response>> = {
+  '/api/checkout': handleCheckout,
+  '/api/webhooks/chip': handleChipWebhook,
+  '/api/enquiry': handleEnquiry,
+};
 
 async function api(request: Request, env: WorkerEnv, ctx: ExecutionContext, path: string): Promise<Response> {
-  if (path === '/api/checkout') {
-    if (request.method !== 'POST') {
-      const res = json({ error: 'Kaedah tidak dibenarkan.' }, 405);
-      res.headers.set('allow', 'POST');
-      return res;
-    }
-    return handleCheckout(request, env, ctx);
+  const handler = ROUTES[path];
+  if (!handler) return json({ error: 'Tidak dijumpai.' }, 404);
+  if (request.method !== 'POST') {
+    const res = json({ error: 'Kaedah tidak dibenarkan.' }, 405);
+    res.headers.set('allow', 'POST');
+    return res;
   }
-  if (NOT_BUILT.has(path)) return json({ error: 'Perkhidmatan ini belum dibuka. Sila cuba lagi kemudian.' }, 501);
-  return json({ error: 'Tidak dijumpai.' }, 404);
+  return handler(request, env, ctx);
 }
 
 export default {
@@ -79,5 +87,18 @@ export default {
     }
 
     return secure(await env.ASSETS.fetch(request));
+  },
+
+  async scheduled(controller, env, ctx): Promise<void> {
+    ctx.waitUntil(
+      reconcile(env, new Date(controller.scheduledTime)).then(
+        () => undefined,
+        (err: unknown) => {
+          const reason = err instanceof Error ? (err.stack ?? err.message) : String(err);
+          return sendAlert(env, `Payment check (cron) crashed:
+${reason}`).then(() => undefined);
+        },
+      ),
+    );
   },
 } satisfies ExportedHandler<WorkerEnv>;

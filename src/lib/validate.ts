@@ -68,14 +68,38 @@ export function validateCheckout(input: CheckoutInput): FieldErrors {
   return prune(errors);
 }
 
+/** Siap Pasang scope questions (optional; the form's pill radios). */
+export const MEDIA_OPTIONS = ['Ya', 'Tidak', 'Belum pasti'] as const;
+export const WRITING_OPTIONS = ['Ya', 'Tidak'] as const;
+
 export interface EnquiryInput {
   name: string;
   email: string;
   phone: string;
   business: string;
   threads: string;
+  /** Number of Threads accounts, "" or 1–99. */
+  accounts: string;
+  /** "" or one of MEDIA_OPTIONS. */
+  media: string;
+  /** "" or one of WRITING_OPTIONS. */
+  writing: string;
   message: string;
   consent: boolean;
+}
+
+/**
+ * The enquiry as plain text lines, for the email (pre-launch mailto) and for
+ * the Notion row and Telegram alert. One wording in both places.
+ */
+export function enquiryDetailLines(input: EnquiryInput): string[] {
+  return [
+    `Bisnes: ${input.business.trim() || '-'}`,
+    `Threads: ${input.threads.trim() || '-'}`,
+    `Bilangan akaun Threads: ${input.accounts.trim() || '-'}`,
+    `Perlu post bergambar/video?: ${input.media || '-'}`,
+    `Perlu bantuan menulis kandungan?: ${input.writing || '-'}`,
+  ];
 }
 
 export function validateEnquiry(input: EnquiryInput): FieldErrors {
@@ -86,6 +110,12 @@ export function validateEnquiry(input: EnquiryInput): FieldErrors {
     phone: validatePhone(input.phone),
     business: input.business.length > 120 ? 'Nama bisnes terlalu panjang.' : undefined,
     threads: input.threads.length > 60 ? 'Nama akaun Threads terlalu panjang.' : undefined,
+    accounts:
+      input.accounts.trim() && !/^(?:[1-9]|[1-9]\d)$/.test(input.accounts.trim())
+        ? 'Masukkan nombor antara 1 hingga 99.'
+        : undefined,
+    media: input.media && !(MEDIA_OPTIONS as readonly string[]).includes(input.media) ? 'Pilih salah satu pilihan.' : undefined,
+    writing: input.writing && !(WRITING_OPTIONS as readonly string[]).includes(input.writing) ? 'Pilih salah satu pilihan.' : undefined,
     message:
       message.length < 10
         ? 'Ceritakan sedikit apa yang anda mahu automasikan.'

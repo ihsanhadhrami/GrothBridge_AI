@@ -11,7 +11,13 @@ TELEGRAM_BOT_TOKEN=
 TELEGRAM_ADMIN_CHAT_ID=
 
 # Phase 3
+# The public key of the webhook made in the CHIP portal (for refunds), as one
+# line with 
+ for the line breaks. Not needed for payments: success_callback
+# is checked with CHIP's company key, which the Worker fetches itself.
 CHIP_PUBLIC_KEY=
+# The Enquiries database ID: the 32 characters in its Notion URL.
 NOTION_ENQUIRIES_DB=
+# Make's custom webhook URL, and the shared secret Make checks X-GB-Signature with.
 MAKE_WEBHOOK_URL=
 MAKE_SHARED_SECRET=

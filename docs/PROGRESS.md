@@ -1,6 +1,6 @@
 # Progress and handoff
 
-Last updated: 2026-11-25.
+Last updated: 2026-11-25 (Phase 3 built).
 
 ## Status
 
@@ -12,13 +12,61 @@ Last updated: 2026-11-25.
   - Done: custom domains growthbridge.my and www (301 to the apex), and security headers set in `worker/index.ts`.
   - Still to do: `wrangler secret put` for the CHIP/Notion/Make/Telegram secrets, and CHIP's checkout domain in the CSP. Both wait on Phase 2/3.
 - **Phase 2 (checkout API): done. Approved by the owner on 2026-11-25** after an end-to-end CHIP test-mode run. See "Phase 2: what was built" below. Committed on branch `phase-2-checkout`, not merged or deployed.
-- **Next: Phase 3** (CHIP webhook, `POST /api/enquiry`, reconciliation cron), when the owner starts it. Read docs/PLAN.md Phase 3 and "Phase 2: what was built" below.
+- **Phase 3 (webhook, enquiries, cron): built and unit-tested on branch `phase-3-webhook` (2026-11-25), waiting for the owner's review.** Not committed, merged or deployed. See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (needs the owner; see "Phase 3: still to test").
 - (Original Phase 2 handoff notes, kept for reference:)
   - The Worker now runs first for every request (`run_worker_first: true`): it 301s www, serves `/api/*` (currently a 501 stub), and passes everything else to the static assets. Build the API inside that same `fetch`.
   - Keep one Worker only; the owner's rule.
   - Turn `PAYMENTS_ENABLED` on only once checkout works in test mode; the checkout form in `src/components/CheckoutForm.tsx` is already wired to `POST /api/checkout`.
   - Put the buyer's name, email and phone, reference = order ID, and the product and package on the CHIP purchase (see "Decisions" below). Build the CHIP redirect and callback URLs from `site.url`.
   - The SSM address is deliberately not on the site (owner's choice, 2026-11-24), even though CHIP asked for it.
+
+## Phase 3: what was built (2026-11-25)
+
+- `POST /api/webhooks/chip` (`worker/webhook.ts`):
+  1. Reads the raw bytes first and checks `X-Signature` (RSA PKCS#1 v1.5, SHA-256, Web Crypto, `worker/crypto.ts`) before parsing.
+     - Two keys are tried. success_callback is signed with CHIP's company key, which the Worker fetches from `GET /public_key/` with `CHIP_SECRET_KEY` and caches per isolate. A webhook made in the CHIP portal (needed for `payment.refunded`) has its own key: that is `CHIP_PUBLIC_KEY`.
+     - Bad or missing signature: 400 and a Telegram alert. Alerts are capped at 3 a minute (`ALERT_RATE_LIMIT`), because anyone can post to this URL.
+     - Key unavailable (CHIP down, secret missing): 500, so CHIP retries.
+  2. Only `purchase.paid` and `payment.refunded` do anything; other events get 200. The purchase is fetched again from CHIP (for a refund, via the Payment's `related_to.id`).
+  3. Checks in `worker/orders.ts` (shared with the cron): our brand, our order-id format, metadata = reference, a package from `src/data/products.ts`, MYR, and total = the package price. For a paid purchase, `payment.amount` must match too.
+     - A failed check: nothing goes to Make, the row is set to Failed with a note, and the owner is alerted. The answer is 200 (a retry can't fix it).
+  4. Paid: the row becomes **Paid** + Paid at (CHIP's `paid_on`) **before** Make is called, then the event goes to `MAKE_WEBHOOK_URL`. If the row is missing (the checkout's Notion write failed), it is rebuilt from the CHIP purchase, with a note and an alert.
+     - Rows already Delivered, Failed or Refunded: nothing is sent (a repeated notification).
+  5. Refund: the event goes to Make; the Worker leaves the row to Make's Refund scenario.
+  6. 200 only after Make answers 200. Make down, Notion down, or a secret missing → 500 + alert, and CHIP retries (up to 8 times over 36 h).
+- To Make: JSON `{event: "paid"|"refunded", order_id, chip_purchase_id, amount (sen), email, name, phone (E.164), product, package, paid_at (ISO UTC), is_test, refunded_amount (refunds only)}`. Header `X-GB-Signature` = lowercase hex HMAC-SHA256(raw body, `MAKE_SHARED_SECRET`). Make has to check that header first (Phase 5). Timeout 15 s.
+- `POST /api/enquiry` (`worker/enquiry.ts`):
+  - 5 per minute per IP (`ENQUIRY_RATE_LIMIT`).
+  - Same validation as the browser; it now also checks the scope fields (accounts 1–99, the two radio groups), shared in `src/lib/validate.ts`.
+  - Notion Enquiries row: Name, Email, Phone, Business, Message (the scope answers + the message), Status New. Then a Telegram alert with everything.
+  - If Notion fails, the alert carries the whole enquiry, and the visitor still gets "sent". Only if Notion and Telegram both fail does the visitor get a 502 with the email address.
+  - A no-JS form post gets a small Malay page.
+  - `ENQUIRY_API_ENABLED` is still false: the live form keeps opening the email app until the owner switches it on.
+- Cron, every 15 minutes (`worker/cron.ts`, `triggers.crons` in `wrangler.jsonc`):
+  - **Paid** with Paid at > 15 min ago (Make hasn't marked it Delivered): re-sent to Make. The owner is alerted the first time. Still Paid 24 h after payment: **Failed** + note + alert.
+  - **Pending** > 15 min: ask CHIP. Paid → exactly the webhook's path (Paid + Make) and a "recovered" alert. Unpaid after 24 h → **Expired** (logged, no alert). Not expired while CHIP says the payment is in progress. CHIP doesn't know the purchase (test vs live key) → alert; Expired after 24 h.
+  - One Telegram message per run, and only when something needs the owner.
+  - At most 45 outside calls per run (the free plan allows 50); the rest wait for the next run.
+  - Secrets missing: logged only while `PAYMENTS_ENABLED` is false, a Telegram alert once it's true.
+- Order status flow (matches the Store Admin page in Notion): Pending (checkout) → Paid (Worker, verified) → Delivered or Failed (Make) → Refunded (Make). Expired (Worker cron).
+- Other changes:
+  - `sendAlert` now reports whether Telegram took the message.
+  - Body parsing and the no-JS page moved to `worker/http.ts`.
+  - The Notion helpers can split long text into several 2,000-character pieces.
+  - `worker-configuration.d.ts` regenerated without the secrets (`wrangler types --env-file <empty file>`). A plain `wrangler types` now reads `.dev.vars` and makes the secrets required, which breaks the build.
+- Tests: 95 in total (`npm test`). New files: `tests/fakes.ts` (fake CHIP, an in-memory Notion, Telegram and Make; RSA keys generated per run), `webhook.test.ts`, `cron.test.ts` and `enquiry.test.ts`. They cover:
+  - a valid signature with either key, a bad signature, a body changed after signing, a missing signature, the alert rate limit, and the key being unavailable
+  - a forged "paid" body for an unpaid purchase, a wrong total, a wrong payment amount, another brand, the enquiry-only package
+  - Make down or timing out, Notion down, Paid set before Make, the same notification twice, a missing row rebuilt, a refund
+  - a missed webhook recovered by the cron, expiry, in-progress payments, Make down and then back, Paid stuck for 24 h, the subrequest budget, and the scheduled handler
+  - enquiry save, errors, Notion down, both down, rate limit, and the no-JS post
+- Checked in `vite preview` (the Workers runtime): pages 200; GET on the new endpoints → 405; enquiry field errors → 400 in Malay; the no-JS error page renders. The real CHIP test-mode `GET /public_key/` answers a JSON PEM string (3072-bit RSA), and `worker/crypto.ts` imports it.
+
+## Phase 3: still to test (needs the owner)
+
+- **Real signed CHIP callback.** Only the deployed Worker can receive one. It needs `wrangler secret put` for CHIP (test key), Notion, Telegram, Make and `NOTION_ENQUIRIES_DB`, then a deploy and one test-mode purchase.
+- **Local run against the real Notion and CHIP test mode.** Needs `MAKE_WEBHOOK_URL` and `MAKE_SHARED_SECRET` in `.dev.vars` (a local catcher works until Make is built in Phase 5), and `NOTION_ENQUIRIES_DB`. It would mark the Phase 2 test order (GB-20261125181720-Y64K, paid in CHIP) as Paid.
+- **Refunds** need a webhook in the CHIP portal (event `payment.refunded`, URL `https://growthbridge.my/api/webhooks/chip`). Its public key goes in `CHIP_PUBLIC_KEY`.
 
 ## Phase 2: what was built (2026-11-25)
 

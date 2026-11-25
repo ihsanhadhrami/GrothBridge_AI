@@ -179,7 +179,7 @@ Last updated: 2026-11-25.
 - **Pre-launch mode:** `PAYMENTS_ENABLED = false` (`src/config.ts`).
   - "Beli" becomes "Pembayaran dibuka tidak lama lagi" + "Tanya melalui emel" (subject "Pertanyaan: <product> <package>", names from products.ts).
   - The Siap Pasang form opens the visitor's email app. The client bundle has no `/api/` call.
-- **OG images:** `public/og/og-home.png` (home, legal pages, Siap Pasang, contact, thanks) and `public/og/og-autopost-threads.png` (product), both owner-supplied and printed with growthbridge.my. The old .ai images are kept, unshipped, in `brand/og-old-domain/`.
+- **OG images:** `public/og/og-home.png` (home, legal pages, Siap Pasang, contact, thanks) and `public/og/og-autopost-threads.png` (product), both owner-supplied and printed with growthbridge.my. The old .ai images were deleted on 2026-11-25 (owner: .ai isn't used at all).
 - **Legal date:** `LEGAL_LAST_UPDATED = '23 November 2026'` (owner: set to today for pre-launch). Update it whenever legal text changes, and at Phase 6.
 - **Footer:** "© 2026 GROWTH BRIDGE ENTERPRISE (202603162028 (NS0324359-K)) · growthbridge.biz@gmail.com", plus the Polisi links (Terma, Privasi, Bayaran Balik, Hubungi).
 - **Verified live (pinned to Cloudflare's address while public DNS caches expired):**
@@ -191,7 +191,7 @@ Last updated: 2026-11-25.
   - Cloudflare Web Analytics auto-injects `static.cloudflareinsights.com/beacon.min.js`, which the CSP blocks (console error).
   - Managed robots.txt prepends `Content-Signal:` lines that Lighthouse flags as unknown.
 - **Deploy command:** `npm run build && npx wrangler deploy`
-- **Stale in docs/PLAN.md:** lines 58 and 223 still describe .ai pricing and the 2-year minimum.
+- **docs/PLAN.md:** the .ai pricing and 2-year minimum were replaced with the .my facts on 2026-11-25 (bought from Exabytes; no price stated, see the invoice).
 
 ## Decisions made with the owner
 

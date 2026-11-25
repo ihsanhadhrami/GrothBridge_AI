@@ -55,7 +55,7 @@ Plus a **scheduled job (Cron Trigger) every 15 minutes:** it checks Notion order
 
 ## Before you build
 
-- [ ] **growthbridge.my** registered (2-year minimum, auto-renew on), with its DNS on Cloudflare
+- [x] **growthbridge.my** registered (Exabytes), with its DNS on Cloudflare. Keep auto-renew on
 - [ ] **CHIP merchant account:** apply with the SSM registration (GROWTH BRIDGE ENTERPRISE, 202603162028). Build with test keys while approval runs; approval checks the live site, so the legal pages go up first
 - [ ] **Cloudflare account** with Workers enabled, and `wrangler` logged in on the computer
 - [ ] **GitHub repo** `growthbridge-store` (private)
@@ -220,7 +220,7 @@ There are five scenarios. Only Delivery runs automatically, triggered instantly 
 | Item | Cost | Note |
 | --- | --- | --- |
 | CHIP Collect | RM1.00 per FPX payment; 1.0% debit card, 2.0% credit card | No setup or monthly fee |
-| growthbridge.my domain | About US$150–230 upfront | .ai domains require a 2-year minimum registration |
+| growthbridge.my domain | Already purchased (Exabytes) | Renewal price and date: see the Exabytes invoice |
 | Cloudflare Workers + static assets | RM0 at this scale | The free tier covers a small store |
 | Make | Current plan | About 10–12 operations per order. Admin scenarios are On demand |
 | Notion, Google Drive, Gmail, Telegram | RM0 | Already in use |

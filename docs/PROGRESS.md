@@ -11,7 +11,8 @@ Last updated: 2026-11-25.
 - **Phase 4 (deploy): mostly done early, for the CHIP review.**
   - Done: custom domains growthbridge.my and www (301 to the apex), and security headers set in `worker/index.ts`.
   - Still to do: `wrangler secret put` for the CHIP/Notion/Make/Telegram secrets, and CHIP's checkout domain in the CSP. Both wait on Phase 2/3.
-- **Phase 2 (checkout API): built and unit-tested on 2026-11-25. Waiting for the owner's review and a real CHIP test-mode run.** See "Phase 2: what was built" below. Not committed or deployed yet.
+- **Phase 2 (checkout API): done. Approved by the owner on 2026-11-25** after an end-to-end CHIP test-mode run. See "Phase 2: what was built" below. Committed on branch `phase-2-checkout`, not merged or deployed.
+- **Next: Phase 3** (CHIP webhook, `POST /api/enquiry`, reconciliation cron), when the owner starts it. Read docs/PLAN.md Phase 3 and "Phase 2: what was built" below.
 - (Original Phase 2 handoff notes, kept for reference:)
   - The Worker now runs first for every request (`run_worker_first: true`): it 301s www, serves `/api/*` (currently a 501 stub), and passes everything else to the static assets. Build the API inside that same `fetch`.
   - Keep one Worker only; the owner's rule.
@@ -60,8 +61,18 @@ Last updated: 2026-11-25.
   - GET → 405; `/api/enquiry` → 501
   - the 11th request in a minute → 429
   - the pages still return 200
-- **Still to do for Phase 2 sign-off:** one real CHIP test-mode purchase. The owner fills `.dev.vars` from `.dev.vars.example` with the CHIP **test** key. Then run `npm run build`, restart `vite preview`, and `POST /api/checkout`. Expect: a `checkout_url`, a Notion row with Pending + "CHIP test mode", and, after paying with test card 4444 3333 2222 1111 / CVC 123, a landing on `/terima-kasih`.
-- `PAYMENTS_ENABLED` is still false. Flipping it also switches the Siap Pasang form to `POST /api/enquiry`, which is Phase 3. So either flip it after Phase 3, or split the flag first (the owner decides).
+- **CHIP test-mode run (2026-11-25), via `vite preview` with `.dev.vars`:**
+  - `POST /api/checkout` → `checkout_url` in about 0.35 s. CHIP has the purchase with `is_test` true, reference `GB-20261125181720-Y64K` and total 8900.
+  - Notion got the Pending row with every field, and Notes "CHIP test mode (not a real payment)."
+  - The owner paid with test card 4444 3333 2222 1111. CHIP shows status `paid`, 8900 MYR, visa, and status history created → viewed → pending_execute → paid. The Notion row stays Pending until the Phase 3 webhook.
+  - Telegram alerts come from @Growthbridgeadminbot to the owner's private chat; a test message was delivered.
+  - CHIP's `success_callback` went to the live `/api/webhooks/chip`, which answers 501 until Phase 3. Expected, and harmless in test mode.
+  - Side effect: two unpaid live purchases, made by mistake with the old live key (see the gotcha under "How to run"). The owner cancels them in the CHIP portal; that key has been rotated.
+- **Launch switches split (owner, 2026-11-25)**, in `src/config.ts`. Both are still false.
+  - `PAYMENTS_ENABLED` controls checkout only. Turn it on once the Worker has the CHIP secrets (`wrangler secret put`).
+  - `ENQUIRY_API_ENABLED` controls the Siap Pasang form (mailto until Phase 3 builds `POST /api/enquiry`).
+  - Checked by a build with only checkout on: the product page shows the real checkout form, and Siap Pasang still opens the email app.
+- **Phase 2 approved by the owner on 2026-11-25.**
 
 ## Phase 1: what was built
 
@@ -212,6 +223,8 @@ npm run build                   # tsc, client + Worker build, SSR build, prerend
 npm test                        # unit tests (vitest)
 npx vite preview --port 4173    # serves dist/ in the Worker runtime
 ```
+
+Gotcha: `vite preview` reads secrets from `dist/growthbridge/.dev.vars`, a copy made by `npm run build`. **After editing `.dev.vars`, rebuild, then restart the preview**; restarting alone keeps the old keys. (2026-11-25: this made two unpaid live CHIP purchases after the switch to the test key.)
 
 Gotcha: after every rebuild, **restart `vite preview`**. It keeps the old asset manifest, so the new hashed CSS returns 404 and pages look unstyled. On Windows, stopping the shell doesn't stop its node child; kill the process listening on 4173.
 

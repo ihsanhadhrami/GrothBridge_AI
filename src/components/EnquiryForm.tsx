@@ -3,7 +3,7 @@ import { site } from '../data/site';
 import { products } from '../data/products';
 import { validateEnquiry, type FieldErrors } from '../lib/validate';
 import { Consent, Field, networkErrorMessage, postJson } from './Field';
-import { PAYMENTS_ENABLED } from '../config';
+import { ENQUIRY_API_ENABLED } from '../config';
 import { enquiryMailto } from '../lib/mailto';
 
 // Names for the email subject come from the products file, like everywhere else.
@@ -13,7 +13,7 @@ const PACKAGE = product.packages.find((p) => p.kind === 'enquiry')?.name ?? 'Sia
 
 /**
  * Siap Pasang enquiry. Live: the Worker saves it to Notion and alerts the
- * owner. Pre-launch (PAYMENTS_ENABLED false): nothing is posted; the visitor's
+ * owner. Pre-launch (ENQUIRY_API_ENABLED false): nothing is posted; the visitor's
  * email app opens with the details filled in, to send themselves.
  */
 export function EnquiryForm() {
@@ -47,7 +47,7 @@ export function EnquiryForm() {
       document.getElementById(Object.keys(found)[0]!)?.focus();
       return;
     }
-    if (!PAYMENTS_ENABLED) {
+    if (!ENQUIRY_API_ENABLED) {
       const body = [
         `Nama: ${v.name.trim()}`,
         `Emel: ${v.email.trim()}`,
@@ -117,9 +117,9 @@ export function EnquiryForm() {
       onSubmit={onSubmit}
       noValidate
       // Without JS: pre-launch hands the fields to the email app, never to /api/*.
-      action={PAYMENTS_ENABLED ? '/api/enquiry' : enquiryMailto(PRODUCT, PACKAGE)}
+      action={ENQUIRY_API_ENABLED ? '/api/enquiry' : enquiryMailto(PRODUCT, PACKAGE)}
       method="post"
-      encType={PAYMENTS_ENABLED ? undefined : 'text/plain'}
+      encType={ENQUIRY_API_ENABLED ? undefined : 'text/plain'}
     >
       <Field id="name" label="Nama penuh" autoComplete="name" value={v.name} onChange={set('name')} error={errors.name} required maxLength={100} />
       <Field id="email" label="Emel" type="email" autoComplete="email" inputMode="email" value={v.email} onChange={set('email')} error={errors.email} required />
@@ -173,7 +173,7 @@ export function EnquiryForm() {
       <Consent checked={consent} onChange={setConsent} error={errors.consent}>
         Saya setuju dengan <a href="/terma">Terma & Syarat</a> dan <a href="/privasi">Notis Privasi</a>.
       </Consent>
-      {!PAYMENTS_ENABLED && (
+      {!ENQUIRY_API_ENABLED && (
         <p className="form-note">Butang ini membuka aplikasi emel anda dengan butiran di atas. Tiada apa dihantar sehingga anda tekan Hantar di sana.</p>
       )}
       {formError && (
@@ -182,7 +182,7 @@ export function EnquiryForm() {
         </p>
       )}
       <button className="btn btn-block" type="submit" disabled={status === 'sending'}>
-        {status === 'sending' ? 'Menghantar…' : PAYMENTS_ENABLED ? 'Hantar pertanyaan' : 'Hantar melalui emel'}
+        {status === 'sending' ? 'Menghantar…' : ENQUIRY_API_ENABLED ? 'Hantar pertanyaan' : 'Hantar melalui emel'}
       </button>
     </form>
   );

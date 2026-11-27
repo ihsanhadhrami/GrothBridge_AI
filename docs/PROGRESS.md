@@ -20,7 +20,13 @@ Last updated: 2026-11-25 (Phase 3 built).
   - **The test uses Make (owner, 2026-11-27).**
     - The owner creates just the Make custom webhook, in a scenario left off, and sets MAKE_WEBHOOK_URL and MAKE_SHARED_SECRET.
     - Make queues what arrives while the scenario is off. Clear that queue or run it in Phase 5.
-  - **Still to confirm:** the Notion Orders "Status" flow. The Worker sets Paid before calling Make; Paid rows are re-sent every 15 minutes; Failed after 24 hours. Explained to the owner 2026-11-27; answer pending.
+  - **Status flow approved by the owner (2026-11-27):** the Worker sets Paid before calling Make; Paid rows are re-sent every 15 minutes; Failed after 24 hours.
+  - **Secrets (2026-11-27):** 8 are on the production Worker: the CHIP test key, CHIP_BRAND_ID, NOTION_TOKEN, NOTION_ORDERS_DB, NOTION_ENQUIRIES_DB, the 2 Telegram secrets, and MAKE_SHARED_SECRET.
+    - Each was piped from `.dev.vars` into `wrangler secret put`; no value was shown.
+    - MAKE_SHARED_SECRET was newly generated and is also in `.dev.vars`; the owner pastes it into Make in Phase 5.
+    - **MAKE_WEBHOOK_URL is set (owner, 2026-11-27).** It points to a new Make custom webhook `growthbridge-orders` in folder `growthbridge.my`, in a saved scenario left OFF. Its value is also in `.dev.vars`. 9 secrets in total; only CHIP_PUBLIC_KEY (refunds) is still missing.
+    - The Notion integration can now open both Orders and Enquiries (checked 2026-11-27).
+    - **Ready for Phase 4:** merge `phase-3-webhook` to main, deploy (owner says go), then run the live test payment.
 - (Original Phase 2 handoff notes, kept for reference:)
   - The Worker now runs first for every request (`run_worker_first: true`): it 301s www, serves `/api/*` (currently a 501 stub), and passes everything else to the static assets. Build the API inside that same `fetch`.
   - Keep one Worker only; the owner's rule.

@@ -7,6 +7,7 @@
     "build": "tsc -b && vite build && vite build --config vite.prerender.config.ts && node scripts/prerender.mjs",
     "preview": "npm run build && wrangler dev --port 8787",
     "typecheck": "tsc -b",
+    "test": "vitest run",
     "deploy": "npm run build && wrangler deploy"
   },
   "dependencies": {
@@ -23,6 +24,7 @@
     "@vitejs/plugin-react": "^6.3.0",
     "typescript": "^7.0.2",
     "vite": "^8.3.8",
+    "vitest": "^5.1.1",
     "wrangler": "^4.166.0"
   }
 }

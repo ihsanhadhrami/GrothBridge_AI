@@ -12,7 +12,7 @@ Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
 - **Phase 2 (checkout API): done. Approved by the owner on 2026-11-25** after an end-to-end CHIP test-mode run. See "Phase 2: what was built" below. Committed on branch `phase-2-checkout`, not merged or deployed.
 - **Phase 3 (webhook, enquiries, cron): built and unit-tested, committed on branch `phase-3-webhook` (1b285b2, 2026-11-25). Merged to main and deployed 2026-11-27; the paid path passed a live CHIP test-mode run (see Phase 4).** See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (see "Phase 3: still to test").
 - **Phase 4 (deploy): done 2026-11-27, awaiting owner review.** See "Phase 4: deploy and live test" below. main fast-forwarded to `phase-3-webhook` (not pushed); live version `536cc2e4`.
-- **Next: Phase 5 (Make + Notion delivery), once the owner approves Phase 4.**
+- **Phase 5 (Make + Notion delivery): started 2026-11-27.** The owner chose: write the spec here, build in Claude chat (CLAUDE.md: no Make/Notion setup from this repo). Spec: [docs/PHASE5-MAKE.md](PHASE5-MAKE.md). Ready per the owner: Drive folder + files, invoice template, Telegram group + bot. Not ready: Masterclass booking link. Open decisions are in section 10 of the spec.
 - (Phase 4 plan as agreed 2026-11-27, kept for reference:)
   1. The owner runs `npx wrangler secret put` for the CHIP **test** key, CHIP_BRAND_ID, NOTION_TOKEN, NOTION_ORDERS_DB, NOTION_ENQUIRIES_DB, TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID. CHIP_PUBLIC_KEY waits for the refund webhook in the CHIP portal.
   2. Merge `phase-3-webhook` to main and deploy (`npm run build && npx wrangler deploy`). Only once the owner says so.

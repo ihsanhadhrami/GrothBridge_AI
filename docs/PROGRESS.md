@@ -54,7 +54,10 @@ Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
   - Y64K was paid on 2026-11-25, more than 24 h ago, so the next run sets it **Failed** with an alert.
   - ZF8Y is re-sent to Make every 15 minutes (alert once), and becomes **Failed** 24 h after payment unless Make marks it Delivered. Each re-send adds an item to the Make queue: **clear the queue before switching on the Delivery scenario in Phase 5**, or the test orders get delivered to growthbridge.biz@gmail.com.
   - The unpaid live purchase GB-20261125175451-XKT9 has no Notion row, so the cron never sees it.
-- **Not tested yet:** refunds (need the CHIP portal webhook and CHIP_PUBLIC_KEY), the enquiry API against the real Notion (`ENQUIRY_API_ENABLED` is false), and Make's side (Phase 5).
+- **Refund webhook (owner, 2026-11-27):** created in the CHIP portal **in test mode**; its key is in `.dev.vars` (valid 3072-bit RSA). CHIP: "test and live Webhooks are separate; test webhooks will not handle events caused by live Purchases, and vice-versa." So **at Phase 6**, create the same webhook in live mode (URL `/api/webhooks/chip`, `payment.refunded` only) and replace `CHIP_PUBLIC_KEY` with the live webhook's key. Payment callbacks need nothing: they use the company key from `GET /public_key/`.
+- **Refund test (2026-11-27):** the owner put CHIP_PUBLIC_KEY on the Worker (10 secrets now) and in `.dev.vars` (quoted, parses whole), then refunded ZF8Y in full in the CHIP portal (test mode). CHIP: `refunded`. The portal webhook reached `/api/webhooks/chip` at 09:29 UTC and got **200**, so the signature verified with CHIP_PUBLIC_KEY and the `refunded` event went to Make (queued). As designed, the Worker leaves the Notion row to Make; until the Refund scenario exists (Phase 5), set Status = Refunded by hand, or every cron run alerts "Paid in Notion, but CHIP now says refunded".
+- **Not tested yet:** the enquiry API against the real Notion (`ENQUIRY_API_ENABLED` is false), and Make's side (Phase 5).
+- (Earlier, before the refund test:) not tested: refunds, the enquiry API against the real Notion (`ENQUIRY_API_ENABLED` is false), and Make's side (Phase 5).
 
 ## Phase 3: what was built (2026-11-25)
 

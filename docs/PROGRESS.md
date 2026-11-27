@@ -1,6 +1,6 @@
 # Progress and handoff
 
-Last updated: 2026-11-25 (Phase 3 built).
+Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
 
 ## Status
 
@@ -8,12 +8,12 @@ Last updated: 2026-11-25 (Phase 3 built).
 - **Phase 1 (site, pages, prerendering): done. Approved by the owner on 2026-11-24.**
   - Live on https://growthbridge.my in pre-launch mode for CHIP merchant review (`PAYMENTS_ENABLED = false`).
   - Pages: 5 policy pages, including Polisi Penghantaran.
-- **Phase 4 (deploy): mostly done early, for the CHIP review.**
-  - Done: custom domains growthbridge.my and www (301 to the apex), and security headers set in `worker/index.ts`.
-  - Still to do: `wrangler secret put` for the CHIP/Notion/Make/Telegram secrets, and CHIP's checkout domain in the CSP. Both wait on Phase 2/3.
+- **Phase 4 (deploy): the domains and headers went live early (2026-11-23) for the CHIP review; finished 2026-11-27** (secrets, Phase 2+3 deployed, CSP with CHIP's checkout domain). See "Phase 4: deploy and live test".
 - **Phase 2 (checkout API): done. Approved by the owner on 2026-11-25** after an end-to-end CHIP test-mode run. See "Phase 2: what was built" below. Committed on branch `phase-2-checkout`, not merged or deployed.
-- **Phase 3 (webhook, enquiries, cron): built and unit-tested, committed on branch `phase-3-webhook` (1b285b2, 2026-11-25).** Not merged, pushed or deployed. See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (see "Phase 3: still to test").
-- **Next (agreed 2026-11-27): finish Phase 4 in a new session. That deploy is also Phase 3's live test.**
+- **Phase 3 (webhook, enquiries, cron): built and unit-tested, committed on branch `phase-3-webhook` (1b285b2, 2026-11-25). Merged to main and deployed 2026-11-27; the paid path passed a live CHIP test-mode run (see Phase 4).** See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (see "Phase 3: still to test").
+- **Phase 4 (deploy): done 2026-11-27, awaiting owner review.** See "Phase 4: deploy and live test" below. main fast-forwarded to `phase-3-webhook` (not pushed); live version `536cc2e4`.
+- **Next: Phase 5 (Make + Notion delivery), once the owner approves Phase 4.**
+- (Phase 4 plan as agreed 2026-11-27, kept for reference:)
   1. The owner runs `npx wrangler secret put` for the CHIP **test** key, CHIP_BRAND_ID, NOTION_TOKEN, NOTION_ORDERS_DB, NOTION_ENQUIRIES_DB, TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID. CHIP_PUBLIC_KEY waits for the refund webhook in the CHIP portal.
   2. Merge `phase-3-webhook` to main and deploy (`npm run build && npx wrangler deploy`). Only once the owner says so.
   3. Run one CHIP test-mode purchase, which the owner pays. Check the signed callback, the Notion row and the alerts. The cron should also recover the Phase 2 test order GB-20261125181720-Y64K (paid in CHIP, still Pending in Notion).
@@ -33,6 +33,28 @@ Last updated: 2026-11-25 (Phase 3 built).
   - Turn `PAYMENTS_ENABLED` on only once checkout works in test mode; the checkout form in `src/components/CheckoutForm.tsx` is already wired to `POST /api/checkout`.
   - Put the buyer's name, email and phone, reference = order ID, and the product and package on the CHIP purchase (see "Decisions" below). Build the CHIP redirect and callback URLs from `site.url`.
   - The SSM address is deliberately not on the site (owner's choice, 2026-11-24), even though CHIP asked for it.
+
+## Phase 4: deploy and live test (2026-11-27)
+
+- **Deployed** with the owner's go: main fast-forwarded to `phase-3-webhook` (9834a83), `npm run build && npx wrangler deploy`. This shipped Phase 2 and Phase 3 together; the site had been on the 2026-11-23 pre-launch Worker. Nothing pushed to GitHub.
+  - Version 135c90f7, then 536cc2e4 (one log line added, below). Cron `*/15 * * * *` registered. Rollout across the edge took about a minute; during it some requests still got the old 501 stub.
+  - 9 secrets on the Worker (`wrangler secret list`); only CHIP_PUBLIC_KEY (refunds) is missing.
+  - Both launch switches are still false: the Beli buttons and the enquiry form still show the pre-launch mailto. But `POST /api/checkout` is live with the CHIP **test** key, so anyone who posts to it gets a test-mode checkout (no real money; a Pending row in Notion).
+- **Verified live:**
+  - All 9 routes 200, each with its own title and canonical on growthbridge.my. sitemap, robots, og image and video 200; unknown paths 404.
+  - www → 301 apex (path and query kept); http → 301 https.
+  - Headers: HSTS, CSP (own scripts only; form-action `'self' mailto: https://gate.chip-in.asia`), X-Frame-Options DENY, Referrer-Policy, nosniff, Permissions-Policy.
+  - API: GET on the 3 endpoints → 405; unknown `/api/*` → 404; empty checkout and enquiry → 400 with the Malay field errors; webhook without a signature → 400; with a bad signature → 400 (+ Telegram alert).
+- **One 500 on the first bad-signature test:** "signature check unavailable", i.e. the Worker could not fetch or import CHIP's company key (`GET /public_key/`) at that moment. It did not happen again. The production key itself works (a live checkout created a CHIP purchase in 1.6 s), and the next bad-signature test got 400. Cause unknown, most likely a one-off failure on CHIP's side or during the rollout. `worker/webhook.ts` now also logs the key error (`[webhook] no usable CHIP key: …`, no buyer data), so if it recurs, the reason is in Workers Logs, not only in Telegram. A real callback in that state gets 500 and CHIP retries, so nothing is lost.
+- **Live test payment (Phase 3 end to end):**
+  - `POST https://growthbridge.my/api/checkout` (Starter; buyer "Ujian Phase 4", growthbridge.biz@gmail.com, placeholder phone) → CHIP test purchase, order `GB-20261127164618-ZF8Y`. The owner paid it with the test card.
+  - CHIP's signed success_callback reached `/api/webhooks/chip` once (08:51 UTC) and was not retried, so the Worker answered 200, which it does only after Make answers 200. The Notion row is **Paid**, Paid at 08:51 UTC. The event is waiting in the Make webhook queue (scenario off).
+  - The cron recovered the Phase 2 order `GB-20261125181720-Y64K` (Pending → Paid, sent to Make).
+- **What the cron will do next (expected, not bugs):**
+  - Y64K was paid on 2026-11-25, more than 24 h ago, so the next run sets it **Failed** with an alert.
+  - ZF8Y is re-sent to Make every 15 minutes (alert once), and becomes **Failed** 24 h after payment unless Make marks it Delivered. Each re-send adds an item to the Make queue: **clear the queue before switching on the Delivery scenario in Phase 5**, or the test orders get delivered to growthbridge.biz@gmail.com.
+  - The unpaid live purchase GB-20261125175451-XKT9 has no Notion row, so the cron never sees it.
+- **Not tested yet:** refunds (need the CHIP portal webhook and CHIP_PUBLIC_KEY), the enquiry API against the real Notion (`ENQUIRY_API_ENABLED` is false), and Make's side (Phase 5).
 
 ## Phase 3: what was built (2026-11-25)
 

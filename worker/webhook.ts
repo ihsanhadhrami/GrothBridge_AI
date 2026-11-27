@@ -66,6 +66,8 @@ export async function handleChipWebhook(request: Request, env: WorkerEnv, ctx: C
   if (!valid) {
     if (keys.length === 0 || companyKeyMissing) {
       // Our fault, not the sender's: we couldn't load a key to check with. 500 so CHIP tries again.
+      // Also logged (no buyer data in it), so the cause can be read in Workers Logs.
+      console.error('[webhook] no usable CHIP key:', keyProblems.join(' | '));
       alert(['CHIP webhook NOT processed: the Worker could not load a key to verify it. CHIP will retry.', ...keyProblems].join('\n'));
       return json({ error: 'signature check unavailable' }, 500);
     }

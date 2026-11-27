@@ -271,7 +271,7 @@ export const products: Product[] = [
         topic: 'Penghantaran',
         question: 'Bila saya dapat bahan selepas bayar?',
         answer:
-          'Emel dengan akses manual, video dan jemputan group Telegram dihantar secara automatik selepas bayaran berjaya. Jika tiada dalam 30 minit, semak folder spam atau hubungi saya.',
+          'Emel dengan akses manual, video dan jemputan group Telegram dihantar secara automatik selepas bayaran berjaya. Manual dan video dikongsi melalui Google Drive, jadi guna emel akaun Google (Gmail) semasa membeli. Jika tiada dalam 30 minit, semak folder spam atau hubungi saya.',
       },
       {
         topic: 'Sokongan',

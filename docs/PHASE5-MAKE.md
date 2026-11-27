@@ -278,3 +278,19 @@ Operations: roughly 12–15 per delivery. Check the Make plan's monthly limit ag
 3. **The Masterclass booking link** (Cal.com or Calendly) isn't ready. Masterclass delivery can't be tested or go live without it.
 4. **Package names in Make.** Today Make maps `starter` → "Starter" itself. Optional: the Worker adds `product_name` and `package_name` (from `src/data/products.ts`) to the event, so the names live in one place. A small Worker change with tests, on a branch.
 5. **Removing a refunded buyer from the Telegram group.** Revoking the invite doesn't remove someone who has already joined, and the bot doesn't learn their user id from a member-limited link. Suggested: the owner removes them by hand, prompted by the refund alert. The support period is 14 days anyway.
+
+## Built vs spec (2026-11-28)
+
+What was built in Make differs from the sections above as follows. Details are in docs/PROGRESS.md, "Phase 5: Make + Notion delivery (2026-11-27/28)".
+
+- **Secret location:** Core has no team custom variables, so the shared secret (and the chat ids) are in the formula of module 2 of "1. Delivery", not in `GB_SHARED_SECRET`.
+- **Webhook answers (section 3, steps 2–3):** with sequential processing on, Make answers every webhook 200 itself and ignores the Webhook response modules. A bad signature gets 200, not 401, and only triggers an alert.
+- **Drive (sections 2–3):** each file is shared on its own, with no `Starter` or `Runbook` subfolders. The manual PDF can be downloaded, on purpose; the video and the Runbook are view-only.
+- **Step order (Route A):** the files are shared before the invoice number is taken, so a failed order uses no number.
+- **Non-Google email (decision 2):** a failed Drive share is a module error, so the error route sets Failed, alerts the owner and emails the buyer asking for a Gmail address. The checkout form and the FAQ now ask for a Google account email.
+- **Error routes:** they set the row to Failed first, then alert.
+- **Decisions:**
+  - Invoice numbers: GB-<year>-NNN, reset each January; test orders TEST-GB-<year>-NNN.
+  - Package names are mapped in Make (decision 4).
+  - A refunded buyer is removed from the Telegram group by hand (decision 5).
+- **Cost:** about 22 operations per delivery and about 24 per resend, not 12–15.

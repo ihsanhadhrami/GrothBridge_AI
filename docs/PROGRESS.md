@@ -1,6 +1,6 @@
 # Progress and handoff
 
-Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
+Last updated: 2026-11-28 (Phase 5: Starter delivery and Resend access built in Make).
 
 ## Status
 
@@ -12,7 +12,7 @@ Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
 - **Phase 2 (checkout API): done. Approved by the owner on 2026-11-25** after an end-to-end CHIP test-mode run. See "Phase 2: what was built" below. Committed on branch `phase-2-checkout`, not merged or deployed.
 - **Phase 3 (webhook, enquiries, cron): built and unit-tested, committed on branch `phase-3-webhook` (1b285b2, 2026-11-25). Merged to main and deployed 2026-11-27; the paid path passed a live CHIP test-mode run (see Phase 4).** See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (see "Phase 3: still to test").
 - **Phase 4 (deploy): done 2026-11-27, awaiting owner review.** See "Phase 4: deploy and live test" below. main fast-forwarded to `phase-3-webhook` (not pushed); live version `536cc2e4`.
-- **Phase 5 (Make + Notion delivery): started 2026-11-27.** The owner chose: write the spec here, build in Claude chat (CLAUDE.md: no Make/Notion setup from this repo). Spec: [docs/PHASE5-MAKE.md](PHASE5-MAKE.md). Ready per the owner: Drive folder + files, invoice template, Telegram group + bot. Not ready: Masterclass booking link. Open decisions are in section 10 of the spec.
+- **Phase 5 (Make + Notion delivery): in progress.** "1. Delivery" (Starter) is ON and "2. Resend access" is tested. Masterclass, refunds and Revoke access are still to do. See "Phase 5: Make + Notion delivery (2026-11-27/28)" below.
 - (Phase 4 plan as agreed 2026-11-27, kept for reference:)
   1. The owner runs `npx wrangler secret put` for the CHIP **test** key, CHIP_BRAND_ID, NOTION_TOKEN, NOTION_ORDERS_DB, NOTION_ENQUIRIES_DB, TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID. CHIP_PUBLIC_KEY waits for the refund webhook in the CHIP portal.
   2. Merge `phase-3-webhook` to main and deploy (`npm run build && npx wrangler deploy`). Only once the owner says so.
@@ -33,6 +33,56 @@ Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
   - Turn `PAYMENTS_ENABLED` on only once checkout works in test mode; the checkout form in `src/components/CheckoutForm.tsx` is already wired to `POST /api/checkout`.
   - Put the buyer's name, email and phone, reference = order ID, and the product and package on the CHIP purchase (see "Decisions" below). Build the CHIP redirect and callback URLs from `site.url`.
   - The SSM address is deliberately not on the site (owner's choice, 2026-11-24), even though CHIP asked for it.
+
+## Phase 5: Make + Notion delivery (2026-11-27/28)
+
+Built in Claude chat with the Make and Notion connectors, from [docs/PHASE5-MAKE.md](PHASE5-MAKE.md). Nothing in Make or Notion is set up from this repo.
+
+- **Make plan upgraded to Core.** Core has no team custom variables, so the shared secret is in the formula of module 2 of "1. Delivery". The chat ids are there too.
+- **Folder `growthbridge.my`:**
+  - **"1. Delivery" (id 8841426): ON.**
+    - Built and tested: the signature check, and Route A (Starter delivery).
+    - Not built yet: a paid Masterclass order or a refund only sends a Telegram alert.
+  - **"2. Resend access" (id 8852891): on demand, tested.** It shares the files with the email in Notion, keeps the invoice number (or issues one), revokes the old invite and makes a new one, rebuilds the invoice PDF (the old copy goes to the bin), sends the email, sets Delivered, and unticks the box.
+  - **Data store `gb-invoice-counter` (276189):**
+    - `live-2026` = 1, because GB-2026-001 was a manual invoice
+    - `test-2026` = 4
+  - **Connections:** new Gmail, Google Docs, Google Drive and Telegram connections (the admin bot, also an admin of the support group), plus a **Notion Internal** integration "Make – GB store" that can open Orders only. The autopost scenario and its connections were not touched.
+- **Owner decisions:**
+  - Invoice numbers continue the manual series: GB-<year>-NNN, reset each January. Test orders get TEST-GB-<year>-NNN.
+  - Drive shares each file on its own; there are no subfolders. The manual PDF can be downloaded, on purpose. The video and the Runbook (PDF + MD) are view-only.
+  - Support hours: 9:00 pagi hingga 12:00 tengah hari. `Support ends` = the payment date + 14 days.
+  - Invoice template: the Google Doc "Invois – templat Make (jangan ubah {{…}})" in the Drive folder "Client's Invoice". The invoice PDFs are saved there too.
+  - A refunded buyer who has already joined the Telegram group: the owner removes them by hand.
+  - Package display names are mapped in Make for now (spec decision 4).
+- **Tests passed (CHIP test mode):**
+  - The HMAC test vector in Make (exec ddcabd1b…; the negative control is a9be9970…).
+  - Bad signature → alert only, nothing done (a6bf4fe9…).
+  - `GB-20261128000623-SNST`: delivered by the Worker's cron re-send (0dde8df4…), invoice TEST-GB-2026-001. Replaying a duplicate stopped at the Paid filter (bd9c38f7…).
+  - `GB-20261128004134-XC5C`: delivered by the direct CHIP callback in about 1 minute (4c30c70f…), invoice TEST-GB-2026-002. Checked from a second Gmail:
+    - only the buyer can open the files
+    - the manual downloads; the video is view-only
+    - an incognito window is denied
+    - the invite works once only
+  - Buyer without a Gmail address, `GB-20261128010902-53NY` (ed226d4a…):
+    - the row went to Failed and the owner was alerted
+    - the buyer got an email asking for a Gmail address
+    - no invoice number was used
+    - then fixed through Resend access (f748b1ff…, TEST-GB-2026-004), and re-run with the old invite revoked (ea3975f2…)
+  - `GB-20261128005928-LLNM` failed before that fix and keeps TEST-GB-2026-003.
+- **Known behaviour (differences from PHASE5-MAKE.md):**
+  - Sequential processing is on, so Make answers every webhook with 200 itself and ignores the Webhook response modules. A bad signature gets 200, not 401, and only triggers an alert.
+  - A failed Drive share is a module error in Make, so the email asking for a Gmail address is sent from the error route.
+  - Files are shared before the invoice number is taken, so failed orders don't use up numbers.
+  - The error routes set the row to Failed first, then alert.
+  - About 22 operations per delivery and about 24 per resend.
+- **Still to do:**
+  1. Masterclass, waiting on the booking link and the owner's OK on the invoice lines and the email paragraph: the Delivery branch, Scenario 3 (Release runbook), and Masterclass in Scenario 2.
+     - **Don't turn `PAYMENTS_ENABLED` on before this is built.** Until then, a paid Masterclass order stays Paid: the cron re-sends it every 15 minutes (an alert each time in Make), then sets it Failed after 24 h.
+  2. Route B (refunds) in "1. Delivery". Test it by refunding XC5C in the CHIP portal (test mode).
+  3. Scenario 4, Revoke access.
+  4. Owner: a new admin-bot token (@BotFather `/revoke`). Then update the Make Telegram connection, run `wrangler secret put TELEGRAM_BOT_TOKEN`, and update `.dev.vars`. Do all of it at once: the Worker's alerts stop when the old token dies.
+  5. This repo: the checkout Gmail note. **Done on `phase-5-make` (2026-11-28), not deployed:** the email field's hint, and one sentence in the "Penghantaran" FAQ.
 
 ## Phase 4: deploy and live test (2026-11-27)
 
@@ -301,6 +351,8 @@ Last updated: 2026-11-27 (Phase 4 deployed; Phase 3 live-tested).
 
 - `LEGAL_LAST_UPDATED` in `src/data/site.ts`: fill in at Phase 6, on the day live CHIP keys go on after the test purchase. The build prints a reminder while it's null.
 - Optional: a video version that ends on growthbridge.my instead of "DM @ihsaaann__".
+- **Masterclass booking link** (Cal.com or Calendly), plus an OK on the Masterclass invoice lines and email paragraph. Masterclass delivery waits for these.
+- **Admin-bot token rotation:** `/revoke` in @BotFather, then the new token in the Make Telegram connection, `wrangler secret put TELEGRAM_BOT_TOKEN` and `.dev.vars`, all at once.
 
 ## How to run
 

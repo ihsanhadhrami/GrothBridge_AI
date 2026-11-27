@@ -90,7 +90,7 @@ export function CheckoutForm({ product, selected, onSelect }: Props) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             error={errors.email}
-            hint="Akses produk dan invois dihantar ke emel ini sahaja."
+            hint="Akses produk dan invois dihantar ke emel ini sahaja. Guna emel akaun Google (Gmail) anda. Manual dan video dikongsi melalui Google Drive dan hanya boleh dibuka dengan akaun Google untuk emel ini."
             required
           />
           <Field

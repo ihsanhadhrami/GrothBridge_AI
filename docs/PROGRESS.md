@@ -12,7 +12,15 @@ Last updated: 2026-11-25 (Phase 3 built).
   - Done: custom domains growthbridge.my and www (301 to the apex), and security headers set in `worker/index.ts`.
   - Still to do: `wrangler secret put` for the CHIP/Notion/Make/Telegram secrets, and CHIP's checkout domain in the CSP. Both wait on Phase 2/3.
 - **Phase 2 (checkout API): done. Approved by the owner on 2026-11-25** after an end-to-end CHIP test-mode run. See "Phase 2: what was built" below. Committed on branch `phase-2-checkout`, not merged or deployed.
-- **Phase 3 (webhook, enquiries, cron): built and unit-tested on branch `phase-3-webhook` (2026-11-25), waiting for the owner's review.** Not committed, merged or deployed. See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (needs the owner; see "Phase 3: still to test").
+- **Phase 3 (webhook, enquiries, cron): built and unit-tested, committed on branch `phase-3-webhook` (1b285b2, 2026-11-25).** Not merged, pushed or deployed. See "Phase 3: what was built" below. The end-to-end run with real CHIP/Notion/Telegram is still to do (see "Phase 3: still to test").
+- **Next (agreed 2026-11-27): finish Phase 4 in a new session. That deploy is also Phase 3's live test.**
+  1. The owner runs `npx wrangler secret put` for the CHIP **test** key, CHIP_BRAND_ID, NOTION_TOKEN, NOTION_ORDERS_DB, NOTION_ENQUIRIES_DB, TELEGRAM_BOT_TOKEN and TELEGRAM_ADMIN_CHAT_ID. CHIP_PUBLIC_KEY waits for the refund webhook in the CHIP portal.
+  2. Merge `phase-3-webhook` to main and deploy (`npm run build && npx wrangler deploy`). Only once the owner says so.
+  3. Run one CHIP test-mode purchase, which the owner pays. Check the signed callback, the Notion row and the alerts. The cron should also recover the Phase 2 test order GB-20261125181720-Y64K (paid in CHIP, still Pending in Notion).
+  - **The test uses Make (owner, 2026-11-27).**
+    - The owner creates just the Make custom webhook, in a scenario left off, and sets MAKE_WEBHOOK_URL and MAKE_SHARED_SECRET.
+    - Make queues what arrives while the scenario is off. Clear that queue or run it in Phase 5.
+  - **Still to confirm:** the Notion Orders "Status" flow. The Worker sets Paid before calling Make; Paid rows are re-sent every 15 minutes; Failed after 24 hours. Explained to the owner 2026-11-27; answer pending.
 - (Original Phase 2 handoff notes, kept for reference:)
   - The Worker now runs first for every request (`run_worker_first: true`): it 301s www, serves `/api/*` (currently a 501 stub), and passes everything else to the static assets. Build the API inside that same `fetch`.
   - Keep one Worker only; the owner's rule.
